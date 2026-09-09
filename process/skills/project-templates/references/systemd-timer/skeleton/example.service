@@ -1,0 +1,44 @@
+# SKELETON. Copying this file will not give you a working unit -- every absolute path below is
+# specific to one machine and must be found on yours. Read ../README.md first.
+#
+# Machine-specific by design, NOT parameterised. A different machine needs its own copy of this
+# file with its own paths. A template with placeholders in it would look portable and would not be.
+
+[Unit]
+Description=One tick of <what this does>
+
+# `OnFailure=` can only name a unit, never a bare script, so notification logic lives in a script
+# run through a TEMPLATED wrapper unit. `%n` expands to THIS unit's own full name before systemd
+# resolves the target, so that name becomes the wrapper's `%i` and the alert always names the unit
+# that actually failed. See ../README.md, decision 1.
+OnFailure=notify-failure@%n.service
+
+[Service]
+Type=oneshot
+
+# The DEPLOY checkout -- merged main only, never the tree anyone edits. Whatever is checked out
+# here IS what runs on the next fire. See ../README.md, decision 3.
+WorkingDirectory=%h/.<app>/app
+
+# Interpreters are not on a systemd user unit's default PATH. Point at a directory of SYMLINKS you
+# maintain, never at a version-carrying path such as an nvm directory. See ../README.md,
+# decision 2.
+Environment=PATH=%h/.<app>/bin:/usr/local/bin:/usr/bin:/bin
+
+# The scheduler's own artifact tree, never the repo's own. A hand-run local invocation must not
+# share watermark or state files with the scheduled one. See ../README.md, decision 5.
+Environment=<APP>_OUTPUT_DIR=%h/.<app>/output
+
+# Production-only values, chmod 600, written by hand. A production connection string does not pass
+# through an agent session.
+EnvironmentFile=%h/.<app>/prod.env
+
+# Outer bound on a wedged run. This MUST stay well under the timer's period: systemd skips a fire
+# while the unit is still active, so a tick that outlives its own interval silently stops the
+# scheduler. Do the arithmetic in a comment here. See ../README.md, decision 4.
+TimeoutStartSec=1800
+
+# Wrapped in a logging script rather than invoked directly, so each tick leaves a durable run log
+# as well as a journal entry. See ../README.md, decision 6, for why the journal alone is not a
+# record on some machines.
+ExecStart=%h/.<app>/app/deploy/run-logged.sh %n %h/.<app>/bin/<runner> <command>

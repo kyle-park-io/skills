@@ -1,0 +1,21 @@
+# SKELETON. Copying this file will not give you a working timer -- every path and name below is
+# a placeholder. Read ../README.md first; the decisions are what transfers, not this file.
+
+[Unit]
+Description=Timer for example.service
+
+[Timer]
+# Minute pinned off :00 on purpose. Every scheduler on the planet fires at :00 and there is no
+# reason to join it.
+#
+# Start conservative. Widening the interval later is a one-line change; explaining a runaway
+# scheduler is not.
+OnCalendar=*-*-* 0/2:17:00
+
+# Runs the missed tick once on the next boot or login if the machine was off, or if the user
+# manager was not running, instead of silently skipping it. On WSL2 the user manager not running
+# is the normal failure mode, not an edge case.
+Persistent=true
+
+[Install]
+WantedBy=timers.target

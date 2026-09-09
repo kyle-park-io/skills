@@ -1,0 +1,44 @@
+# What does NOT get uploaded by `npx vercel deploy --prod`.
+#
+# Harvested from mantle-kr-herald. Two incidents shaped this file; both are in this piece's
+# README.md. Read it before editing a single line here.
+#
+# That command uploads the local directory, NOT a commit -- so without this file, what ships is
+# whatever happens to be sitting in the working tree, including gitignored credentials that
+# `git status` never shows you. Whether the CLI falls back to `.gitignore` when this file is
+# absent is not something a deploy should depend on: state it here instead.
+#
+# EVERY DIRECTORY PATTERN BELOW IS ANCHORED WITH A LEADING `/`. This is gitignore syntax: an
+# unanchored `translation/` matches a directory of that name AT ANY DEPTH, including one your
+# serverless function needs. Pin this with a test; see README.md.
+#
+# `vercel.json` is uploaded regardless of what this file says -- the platform needs it to build.
+
+# --- credentials. The reason this file exists. Unanchored on purpose: an `.env` at any depth is
+#     the same mistake wherever it is.
+.env
+.env.*
+/keys/
+
+# --- installed on the platform from the lockfile; uploading them wastes the whole upload.
+#     Unanchored on purpose: a nested `node_modules/` is just as pointless to ship.
+node_modules/
+
+# --- build artefacts. The build command regenerates these on the platform; shipping a local copy
+#     would let a stale bundle win over the one the platform just built.
+/web/dist/
+/dist/
+/.vercel/
+
+# --- not part of the running deployment ---
+/tests/
+/web/tests/
+/docs/
+/.github/
+/vitest.config.ts
+*.md
+
+# --- local-only pipeline data and scheduler units. ANCHORED: unanchored `deploy/` would also match
+#     `src/deploy/`, which the function needs. That is the exact mistake described in the header.
+/deploy/
+/output/

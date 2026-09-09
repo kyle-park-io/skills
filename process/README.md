@@ -26,6 +26,16 @@
 | `claude-code-setup` | 레포를 분석해 필요한 훅·스킬·MCP를 역으로 추천 |
 | `remember` | 대화를 계층형 로그로 압축, 세션 간 컨텍스트 유지 |
 
+## 들어 있는 스킬
+
+| 스킬 | 언제 |
+|---|---|
+| [`project-templates`](skills/project-templates) | 성숙한 레포에서 CI·배포 설정을 근거와 함께 뽑아둘 때, 또는 새 레포에 그중 무엇을 넣을지 고를 때 |
+
+`project-templates`의 조각은 `references/` 아래에 산다. **평소 컨텍스트 비용은 `description` 한 줄뿐이다.** `references/`는 읽기 전까지 안 들어오므로 조각이 늘어도 상주 비용은 그대로다.
+
+`description`을 고치면 `scripts/real-trigger-eval.py`로 다시 잰다. 부정 쿼리는 `claude-code-setup`의 자동화 추천과 `superpowers:brainstorming` 쪽으로 채운다. 셋 다 "레포를 보고 무엇을 넣을지 정한다"로 들려서, 여기서 겹치는 것이 이 스킬의 주된 실패 방식이다.
+
 ## 여기 넣을 스킬 후보
 
 **superpowers와 겹치면 만들지 않는다.** 내 고유 관례만:

@@ -1,0 +1,24 @@
+# SKELETON. Read ../README.md, decision 1.
+#
+# Templated `OnFailure=` target, shared by every scheduled unit that wants this hook. Templated
+# (`@.service` + `%i`) rather than a single fixed unit: with a hardcoded unit name inside the
+# script, whichever unit did NOT get that name reports the wrong unit and tails the wrong journal.
+
+[Unit]
+Description=Failure notice for %i
+
+[Service]
+Type=oneshot
+
+# A bounded backstop over the script's own internal timeouts. Overrunning this does not merely
+# truncate the alert: systemd SIGTERMs the hook mid-send, so the message never arrives AND the
+# hook itself enters `failed`, which is the one thing a failure handler must not do.
+#
+# Size the script's internal timeouts as a sum against this number and write the arithmetic down
+# in both files. Adding one more network call to the script means redoing that sum.
+TimeoutStartSec=30
+
+# The deploy checkout, not the development tree. This matters MORE here than in the scheduled unit:
+# a scheduled unit running unmerged code fails loudly, while a failure hook running unmerged code
+# fails silently, because the only thing it would ever have said is that something else failed.
+ExecStart=%h/.<app>/app/deploy/notify-failure.sh %i
