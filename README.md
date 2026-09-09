@@ -73,3 +73,7 @@ ln -s ~/code/skills ~/.agents/skills
 2. `SKILL.md`를 직접 읽어 `description`과 본문이 같은 말을 하는지 확인
 3. 프로젝트 스코프로만 먼저 켜기
 4. 며칠 써본 뒤 유저 스코프 승격 판단
+
+## License
+
+[MIT](./LICENSE)
