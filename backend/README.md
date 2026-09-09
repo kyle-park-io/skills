@@ -29,3 +29,11 @@ DB 플러그인을 붙이면 스키마를 직접 읽고 마이그레이션을 �
 ## 설정 프리셋
 
 이 도메인의 도구는 [`backend-postgres`](../presets/project/backend-postgres) 프리셋에 들어간다. 적용법은 [`presets/README.md`](../presets)를 본다.
+
+## 설치
+
+```bash
+claude plugin install backend@kyle-skills
+```
+
+스킬은 `backend/skills/` 아래에 둔다.

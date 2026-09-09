@@ -1,0 +1,11 @@
+{
+  "name": "architecture",
+  "description": "코드베이스 구조 파악, 다이어그램, ADR",
+  "version": "0.1.0",
+  "author": {
+    "name": "kyle-park-io"
+  },
+  "homepage": "https://github.com/kyle-park-io/skills/tree/main/architecture",
+  "repository": "https://github.com/kyle-park-io/skills",
+  "license": "MIT"
+}

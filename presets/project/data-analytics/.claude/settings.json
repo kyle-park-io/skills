@@ -2,6 +2,7 @@
   "enabledPlugins": {
     "duckdb-skills@claude-plugins-official": true,
     "grafana-mcp@claude-plugins-official": true,
-    "pyright-lsp@claude-plugins-official": true
+    "pyright-lsp@claude-plugins-official": true,
+    "dashboard@kyle-skills": true
   }
 }

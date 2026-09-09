@@ -29,3 +29,11 @@ UI 구현, 성능 진단, 브라우저 검증.
 ## 설정 프리셋
 
 이 도메인의 도구는 [`nextjs-vercel`](../presets/project/nextjs-vercel) 프리셋에 들어간다. 적용법은 [`presets/README.md`](../presets)를 본다.
+
+## 설치
+
+```bash
+claude plugin install frontend@kyle-skills
+```
+
+스킬은 `frontend/skills/` 아래에 둔다.

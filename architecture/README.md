@@ -22,3 +22,11 @@
 - `adr-writing`: 결정 기록 포맷과 언제 남길지의 기준
 - `diagram-first`: 코드 쓰기 전 데이터 흐름을 먼저 그리게 강제
 - `boundary-review`: 모듈 경계가 새는지 판별하는 체크리스트
+
+## 설치
+
+```bash
+claude plugin install architecture@kyle-skills
+```
+
+스킬은 `architecture/skills/` 아래에 둔다.

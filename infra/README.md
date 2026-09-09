@@ -29,3 +29,11 @@ IaC 쪽은 반대 문제다. state·잠금·drift 같은 개념이 코드에 안
 ## 설정 프리셋
 
 이 도메인의 도구는 [`infra-terraform`](../presets/project/infra-terraform) · [`nextjs-vercel`](../presets/project/nextjs-vercel) 프리셋에 들어간다. 적용법은 [`presets/README.md`](../presets)를 본다.
+
+## 설치
+
+```bash
+claude plugin install infra@kyle-skills
+```
+
+스킬은 `infra/skills/` 아래에 둔다.

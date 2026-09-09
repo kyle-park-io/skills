@@ -2,6 +2,7 @@
   "enabledPlugins": {
     "prisma@claude-plugins-official": true,
     "postman@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true
+    "typescript-lsp@claude-plugins-official": true,
+    "backend@kyle-skills": true
   }
 }

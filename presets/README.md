@@ -6,7 +6,7 @@
 
 레포 하나에는 `.claude/settings.json`이 하나다. Next.js + Postgres 앱이면 frontend·backend·infra 세 도메인에서 끌어와야 하는데, 도메인별 조각으로 흩어두면 쓸 때마다 손으로 합쳐야 한다. 설정이 실제로 적용되는 단위가 스택이므로 그 축으로 자른다.
 
-도메인 폴더(`../backend` 등)는 **스킬** 네임스페이스다. 하위 폴더 하나가 스킬 하나이고, 통째로 `~/.claude/skills/`에 심볼릭 링크될 수 있다. 거기에 설정 JSON을 두면 스킬 디렉터리 안으로 딸려 들어가 아무 의미 없는 파일이 된다.
+도메인 폴더(`../backend` 등)는 그 자체가 **플러그인**이다. `.claude-plugin/plugin.json`과 `skills/`로 이뤄지고, 설치되면 하네스가 통째로 가져간다. 거기에 설정 JSON을 두면 플러그인 페이로드에 딸려 들어가 아무 의미 없는 파일이 된다.
 
 ## 세 스코프의 역할
 
@@ -26,7 +26,7 @@
 
 ## user/
 
-유저 스코프 원본. 플러그인 8개.
+유저 스코프 원본. 플러그인 10개. 공식 8개와 내 도메인 플러그인 2개다.
 
 **여기 둘 조건은 "언제 쓸지 모른다"가 아니라 "어느 레포에서든 쓴다"다.** 10개를 넘기지 않는다. 근거는 [`../docs/SETUP-GUIDE.md`](../docs/SETUP-GUIDE.md) §1, §3.
 
@@ -40,6 +40,10 @@
 | `context7` | 최신 라이브러리 문서 조회 |
 | `github` | 이슈·PR·CI |
 | `sentry` | 에러·스택 트레이스 |
+| `architecture@kyle-skills` | 내 아키텍처 스킬 |
+| `process@kyle-skills` | 내 작업 절차 스킬 |
+
+**내 도메인 플러그인도 똑같이 10개에 센다.** 지금이 정확히 한도다. 하나 더 넣으려면 하나를 내려야 한다. `skill-authoring@kyle-skills`는 스킬을 쓰는 자리가 이 레포뿐이라 여기 넣지 않고 `skills` 레포의 프로젝트 스코프로 뒀다.
 
 `env.CONTEXT7_API_KEY`는 빈 값으로 두었다. [context7.com/dashboard](https://context7.com/dashboard)에서 발급해 채운다. 비워두면 401이 난다. 이유는 SETUP-GUIDE §7.
 
@@ -60,12 +64,14 @@ $EDITOR ~/.claude/settings.json
 cp -r presets/project/nextjs-vercel/.claude <대상 레포>/
 ```
 
-| 프리셋 | 플러그인 | 관련 도메인 |
+| 프리셋 | 공식 플러그인 | 내 도메인 |
 |---|---|---|
-| `nextjs-vercel` | vercel · frontend-design · playwright · chrome-devtools-mcp · modern-web-guidance · typescript-lsp | [frontend](../frontend), [infra](../infra) |
-| `backend-postgres` | prisma · postman · typescript-lsp | [backend](../backend) |
-| `data-analytics` | duckdb-skills · grafana-mcp · pyright-lsp | [dashboard](../dashboard) |
-| `infra-terraform` | terraform · aws-core · semgrep | [infra](../infra) |
+| `nextjs-vercel` | vercel · frontend-design · playwright · chrome-devtools-mcp · modern-web-guidance · typescript-lsp | `frontend` · `infra` |
+| `backend-postgres` | prisma · postman · typescript-lsp | `backend` |
+| `data-analytics` | duckdb-skills · grafana-mcp · pyright-lsp | `dashboard` |
+| `infra-terraform` | terraform · aws-core · semgrep | `infra` |
+
+오른쪽 열은 함께 켜지는 내 도메인 플러그인이다. 프리셋 JSON에 `@kyle-skills`로 들어가 있으므로 [마켓플레이스를 먼저 등록](../README.md#쓰는-법)해야 설치된다.
 
 ### 바꿔 끼우는 자리
 

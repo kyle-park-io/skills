@@ -1,0 +1,11 @@
+{
+  "name": "frontend",
+  "description": "UI 구현, 성능 진단, 브라우저 검증",
+  "version": "0.1.0",
+  "author": {
+    "name": "kyle-park-io"
+  },
+  "homepage": "https://github.com/kyle-park-io/skills/tree/main/frontend",
+  "repository": "https://github.com/kyle-park-io/skills",
+  "license": "MIT"
+}

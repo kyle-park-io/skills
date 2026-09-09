@@ -32,3 +32,11 @@
 
 - `handoff-note`: 세션을 끊을 때 남기는 형식
 - `repo-onboarding`: 내 레포들에서 반복되는 진입 순서
+
+## 설치
+
+```bash
+claude plugin install process@kyle-skills
+```
+
+스킬은 `process/skills/` 아래에 둔다.

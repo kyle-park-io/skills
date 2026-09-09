@@ -5,6 +5,8 @@
     "playwright@claude-plugins-official": true,
     "chrome-devtools-mcp@claude-plugins-official": true,
     "modern-web-guidance@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true
+    "typescript-lsp@claude-plugins-official": true,
+    "frontend@kyle-skills": true,
+    "infra@kyle-skills": true
   }
 }

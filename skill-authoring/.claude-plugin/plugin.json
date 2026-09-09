@@ -1,0 +1,11 @@
+{
+  "name": "skill-authoring",
+  "description": "스킬을 만들고 검증하는 법",
+  "version": "0.1.0",
+  "author": {
+    "name": "kyle-park-io"
+  },
+  "homepage": "https://github.com/kyle-park-io/skills/tree/main/skill-authoring",
+  "repository": "https://github.com/kyle-park-io/skills",
+  "license": "MIT"
+}

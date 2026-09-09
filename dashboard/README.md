@@ -27,3 +27,11 @@
 ## 설정 프리셋
 
 이 도메인의 도구는 [`data-analytics`](../presets/project/data-analytics) 프리셋에 들어간다. 적용법은 [`presets/README.md`](../presets)를 본다.
+
+## 설치
+
+```bash
+claude plugin install dashboard@kyle-skills
+```
+
+스킬은 `dashboard/skills/` 아래에 둔다.

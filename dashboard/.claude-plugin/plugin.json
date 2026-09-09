@@ -1,0 +1,11 @@
+{
+  "name": "dashboard",
+  "description": "데이터 접근, 차트, BI 도구",
+  "version": "0.1.0",
+  "author": {
+    "name": "kyle-park-io"
+  },
+  "homepage": "https://github.com/kyle-park-io/skills/tree/main/dashboard",
+  "repository": "https://github.com/kyle-park-io/skills",
+  "license": "MIT"
+}

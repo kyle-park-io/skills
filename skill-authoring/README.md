@@ -34,3 +34,11 @@
 ## 안전
 
 외부 스킬은 [`NVIDIA/SkillSpector`](https://github.com/NVIDIA/SkillSpector)로 스캔한 뒤에 넣는다. 루트 README의 절차 참조.
+
+## 설치
+
+```bash
+claude plugin install skill-authoring@kyle-skills
+```
+
+스킬은 `skill-authoring/skills/` 아래에 둔다.
