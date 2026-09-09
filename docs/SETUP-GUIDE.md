@@ -63,9 +63,25 @@ claude plugin install vercel@claude-plugins-official   # scope: project
 
 ---
 
-## 3. 결정: 유저 스코프는 10개까지
+## 3. 결정: 유저 스코프는 스킬 30개까지
 
 어디서나 쓰는 것만 유저 스코프에 둔다. 언어·스택 중립이어야 한다.
+
+**세는 단위는 플러그인이 아니라 스킬이다.** 플러그인 개수는 실제 비용을 감춘다. 현재 유저 스코프 10개 플러그인이 스킬 25개를 싣는데, 분포가 고르지 않다.
+
+| 플러그인 | 스킬 | 성격 |
+|---|---:|---|
+| `superpowers` | 14 | 스킬 |
+| `sentry` | 8 | 스킬 |
+| `claude-code-setup` · `claude-md-management` · `skill-creator` | 각 1 | 스킬 |
+| `context7` · `github` · `serena` | 0 | MCP 전용 |
+| `architecture@kyle-skills` · `process@kyle-skills` | 0 | 아직 비어 있음 |
+
+`superpowers` 하나가 절반이고 `sentry`가 8개인데, MCP 전용 셋은 스킬을 하나도 싣지 않는다. "플러그인 10개"라는 숫자로는 이 차이가 안 보인다.
+
+**MCP 전용 플러그인은 별도 예산이다.** 이들이 싣는 건 스킬 설명문이 아니라 MCP 툴 정의다. 같은 서버를 `claude mcp add`로 직접 붙여도 툴 정의는 똑같이 들어가므로, 플러그인을 내린다고 컨텍스트가 줄지 않는다. 스킬 예산과 섞어 세지 않는다.
+
+여기에 하네스 내장 16개가 항상 더해진다. 그래서 상주 스킬은 실제로 16 + 25 = 41개다.
 
 ```
 superpowers            작업 절차
@@ -225,7 +241,7 @@ DB·클라우드·프레임워크·BI는 **전부 프로젝트 스코프**다. �
 1. [`NVIDIA/SkillSpector`](https://github.com/NVIDIA/SkillSpector)로 스캔해 악성 페이로드·취약점을 확인한다
 2. `SKILL.md`를 직접 읽어 `description`과 본문이 같은 말을 하는지 확인한다
 3. 프로젝트 스코프로만 먼저 켠다
-4. 며칠 써본 뒤 유저 스코프 승격을 판단한다. §3의 10개 한도 안에서다
+4. 며칠 써본 뒤 유저 스코프 승격을 판단한다. §3의 스킬 30개 한도 안에서다
 
 ---
 

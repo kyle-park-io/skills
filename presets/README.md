@@ -28,7 +28,7 @@
 
 유저 스코프 원본. 플러그인 10개. 공식 8개와 내 도메인 플러그인 2개다.
 
-**여기 둘 조건은 "언제 쓸지 모른다"가 아니라 "어느 레포에서든 쓴다"다.** 10개를 넘기지 않는다. 근거는 [`../docs/SETUP-GUIDE.md`](../docs/SETUP-GUIDE.md) §1, §3.
+**여기 둘 조건은 "언제 쓸지 모른다"가 아니라 "어느 레포에서든 쓴다"다.** 스킬 30개를 넘기지 않는다 (현재 25개). 근거는 [`../docs/SETUP-GUIDE.md`](../docs/SETUP-GUIDE.md) §1, §3.
 
 | 플러그인 | 역할 |
 |---|---|
@@ -43,7 +43,7 @@
 | `architecture@kyle-skills` | 내 아키텍처 스킬 |
 | `process@kyle-skills` | 내 작업 절차 스킬 |
 
-**내 도메인 플러그인도 똑같이 10개에 센다.** 지금이 정확히 한도다. 하나 더 넣으려면 하나를 내려야 한다. `skill-authoring@kyle-skills`는 스킬을 쓰는 자리가 이 레포뿐이라 여기 넣지 않고 `skills` 레포의 프로젝트 스코프로 뒀다.
+**내 도메인 플러그인도 똑같이 센다.** 지금은 스킬 25개라 여유가 있지만, 도메인에 스킬을 채우면 금방 찬다. `skill-authoring@kyle-skills`는 스킬을 쓰는 자리가 이 레포뿐이라 여기 넣지 않고 `skills` 레포의 프로젝트 스코프로 뒀다.
 
 `env.CONTEXT7_API_KEY`는 빈 값으로 두었다. [context7.com/dashboard](https://context7.com/dashboard)에서 발급해 채운다. 비워두면 401이 난다. 이유는 SETUP-GUIDE §7.
 
