@@ -20,10 +20,15 @@ DB 플러그인을 붙이면 스키마를 직접 읽고 마이그레이션을 �
 | `42crunch-api-security-testing` | OpenAPI 스펙 자동 감사. 공개 API를 낼 때 |
 | [`addyosmani/agent-skills`](https://github.com/addyosmani/agent-skills) | `api-and-interface-design`만 발췌해 참고 |
 
+## 여기 있는 스킬
+
+| 스킬 | 언제 |
+|---|---|
+| [`schema-review`](skills/schema-review) | 마이그레이션을 쓰기 전, 또는 적용하기 전 |
+
 ## 여기 넣을 스킬 후보
 
 - `api-design`: 엔드포인트 설계 시 물어야 할 것 (버저닝·에러 형태·페이지네이션)
-- `schema-review`: 마이그레이션 전 확인 목록 (인덱스·NOT NULL·롤백 경로)
 - `idempotency`: 재시도 안전성을 어디에 넣을지
 
 ## 설정 프리셋
