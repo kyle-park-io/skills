@@ -7,5 +7,11 @@
   },
   "homepage": "https://github.com/kyle-park-io/skills/tree/main/skill-authoring",
   "repository": "https://github.com/kyle-park-io/skills",
-  "license": "MIT"
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "authoring",
+    "eval",
+    "agents"
+  ]
 }

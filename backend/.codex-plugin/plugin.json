@@ -1,0 +1,35 @@
+{
+  "name": "backend",
+  "version": "0.1.0",
+  "description": "API 경계 설계, 스키마, 마이그레이션",
+  "author": {
+    "name": "kyle-park-io"
+  },
+  "homepage": "https://github.com/kyle-park-io/skills/tree/main/backend",
+  "repository": "https://github.com/kyle-park-io/skills",
+  "license": "MIT",
+  "keywords": [
+    "api",
+    "schema",
+    "migration",
+    "backend"
+  ],
+  "skills": "./skills/",
+  "hooks": {},
+  "interface": {
+    "displayName": "backend",
+    "shortDescription": "API boundaries, schemas, and migrations that survive review",
+    "longDescription": "API 경계 설계, 스키마, 마이그레이션",
+    "developerName": "kyle-park-io",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read"
+    ],
+    "defaultPrompt": [
+      "이 마이그레이션 검토해줘.",
+      "이 엔드포인트 설계 좀 봐줘."
+    ],
+    "websiteURL": "https://github.com/kyle-park-io/skills"
+  }
+}

@@ -7,5 +7,11 @@
   },
   "homepage": "https://github.com/kyle-park-io/skills/tree/main/backend",
   "repository": "https://github.com/kyle-park-io/skills",
-  "license": "MIT"
+  "license": "MIT",
+  "keywords": [
+    "api",
+    "schema",
+    "migration",
+    "backend"
+  ]
 }

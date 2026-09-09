@@ -1,0 +1,35 @@
+{
+  "name": "architecture",
+  "version": "0.1.0",
+  "description": "코드베이스 구조 파악, 다이어그램, ADR",
+  "author": {
+    "name": "kyle-park-io"
+  },
+  "homepage": "https://github.com/kyle-park-io/skills/tree/main/architecture",
+  "repository": "https://github.com/kyle-park-io/skills",
+  "license": "MIT",
+  "keywords": [
+    "architecture",
+    "adr",
+    "diagram",
+    "refactoring"
+  ],
+  "skills": "./skills/",
+  "hooks": {},
+  "interface": {
+    "displayName": "architecture",
+    "shortDescription": "Read an existing codebase by symbol, then pin the understanding down",
+    "longDescription": "코드베이스 구조 파악, 다이어그램, ADR",
+    "developerName": "kyle-park-io",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read"
+    ],
+    "defaultPrompt": [
+      "이 레포의 구조를 파악해줘.",
+      "이 모듈의 의존성을 그려줘."
+    ],
+    "websiteURL": "https://github.com/kyle-park-io/skills"
+  }
+}

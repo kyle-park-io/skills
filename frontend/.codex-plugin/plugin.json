@@ -1,0 +1,35 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "description": "UI 구현, 성능 진단, 브라우저 검증",
+  "author": {
+    "name": "kyle-park-io"
+  },
+  "homepage": "https://github.com/kyle-park-io/skills/tree/main/frontend",
+  "repository": "https://github.com/kyle-park-io/skills",
+  "license": "MIT",
+  "keywords": [
+    "frontend",
+    "ui",
+    "performance",
+    "accessibility"
+  ],
+  "skills": "./skills/",
+  "hooks": {},
+  "interface": {
+    "displayName": "frontend",
+    "shortDescription": "UI work, measured performance triage, and browser verification",
+    "longDescription": "UI 구현, 성능 진단, 브라우저 검증",
+    "developerName": "kyle-park-io",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read"
+    ],
+    "defaultPrompt": [
+      "이 화면이 왜 느린지 측정해줘.",
+      "접근성 검증해줘."
+    ],
+    "websiteURL": "https://github.com/kyle-park-io/skills"
+  }
+}

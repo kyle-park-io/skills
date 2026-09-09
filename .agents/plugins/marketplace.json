@@ -1,0 +1,92 @@
+{
+  "name": "kyle-skills",
+  "interface": {
+    "displayName": "Kyle's Skills"
+  },
+  "plugins": [
+    {
+      "name": "architecture",
+      "source": {
+        "source": "url",
+        "url": "./architecture"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "NONE"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "backend",
+      "source": {
+        "source": "url",
+        "url": "./backend"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "NONE"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "frontend",
+      "source": {
+        "source": "url",
+        "url": "./frontend"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "NONE"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "dashboard",
+      "source": {
+        "source": "url",
+        "url": "./dashboard"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "NONE"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "infra",
+      "source": {
+        "source": "url",
+        "url": "./infra"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "NONE"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "process",
+      "source": {
+        "source": "url",
+        "url": "./process"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "NONE"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "skill-authoring",
+      "source": {
+        "source": "url",
+        "url": "./skill-authoring"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "NONE"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

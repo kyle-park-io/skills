@@ -8,11 +8,18 @@
 
 ## 쓰는 법
 
+Claude Code 와 Codex 양쪽을 지원한다. 스킬 본문은 하나이고, 하네스별로 다른 건 매니페스트뿐이다.
+
 ### 최초 1회
 
 ```bash
+# Claude Code
 claude plugin marketplace add kyle-park-io/skills
+
+# Codex 및 크로스 런타임 하네스는 .agents/plugins/marketplace.json 을 읽는다
 ```
+
+플러그인을 쓰지 않고 스킬만 가져가려면 `~/.agents/skills/` 에 링크한다. Codex, Copilot CLI, Gemini CLI 가 공통으로 인식하는 경로다. 다만 전 도메인이 상주하므로 아래 컨텍스트 예산 원칙과 상충한다.
 
 ### 어디서나 쓸 도메인은 유저 스코프로
 
@@ -56,8 +63,14 @@ claude plugin marketplace update kyle-skills
 
 ```
 skills/
+├── domains.json           단일 진실 원본. 매니페스트는 여기서 생성된다
+├── scripts/
+│   └── gen-manifests.py   하네스별 매니페스트 생성기
+├── AGENTS.md              이 레포에서 작업하는 에이전트용 지침
 ├── .claude-plugin/
-│   └── marketplace.json   도메인 7개를 플러그인으로 선언
+│   └── marketplace.json   Claude Code 마켓플레이스 (생성물)
+├── .agents/plugins/
+│   └── marketplace.json   크로스 런타임 마켓플레이스 (생성물)
 ├── architecture/          코드베이스 구조 파악, 다이어그램, ADR
 ├── backend/               API 경계 설계, 스키마, 마이그레이션
 ├── frontend/              UI 구현, 성능 진단, 브라우저 검증
@@ -78,15 +91,19 @@ skills/
 
 ```
 backend/
-├── .claude-plugin/
-│   └── plugin.json       이름·버전·라이선스
-├── README.md             카탈로그
+├── .claude-plugin/plugin.json   Claude Code 매니페스트 (생성물)
+├── .codex-plugin/plugin.json    Codex 매니페스트 (생성물)
+├── README.md                    카탈로그
 └── skills/
     └── api-design/
-        ├── SKILL.md      필수
-        ├── references/   선택. 길어지는 참고자료
-        └── scripts/      선택. 실행 스크립트
+        ├── SKILL.md             필수. 하네스 공용
+        ├── references/          선택. 길어지는 참고자료
+        └── scripts/             선택. 실행 스크립트
 ```
+
+**매니페스트는 손으로 고치지 않는다.** `domains.json` 을 고치고 `python3 scripts/gen-manifests.py` 를 돌린다. 도메인 7개에 하네스 2개라 매니페스트가 16개다. 손으로 맞추면 갈라진다.
+
+**스킬 본문에는 하네스의 툴 이름을 쓰지 않는다.** "파일을 읽는다"라고 쓰지 "Read 툴로 읽는다"라고 쓰지 않는다. 이것이 같은 파일이 양쪽에서 그대로 도는 유일한 이유다. 자세한 건 [`AGENTS.md`](AGENTS.md).
 
 스킬은 반드시 `<도메인>/skills/` 아래에 둔다. 도메인 폴더 바로 밑이 아니다.
 

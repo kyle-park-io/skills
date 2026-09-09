@@ -1,0 +1,35 @@
+{
+  "name": "dashboard",
+  "version": "0.1.0",
+  "description": "데이터 접근, 차트, BI 도구",
+  "author": {
+    "name": "kyle-park-io"
+  },
+  "homepage": "https://github.com/kyle-park-io/skills/tree/main/dashboard",
+  "repository": "https://github.com/kyle-park-io/skills",
+  "license": "MIT",
+  "keywords": [
+    "dashboard",
+    "analytics",
+    "sql",
+    "bi"
+  ],
+  "skills": "./skills/",
+  "hooks": {},
+  "interface": {
+    "displayName": "dashboard",
+    "shortDescription": "Reach the data first, then chart it",
+    "longDescription": "데이터 접근, 차트, BI 도구",
+    "developerName": "kyle-park-io",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read"
+    ],
+    "defaultPrompt": [
+      "이 데이터 파일 훑어줘.",
+      "이 지표 정의를 정리해줘."
+    ],
+    "websiteURL": "https://github.com/kyle-park-io/skills"
+  }
+}

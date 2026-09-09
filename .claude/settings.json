@@ -1,5 +1,3 @@
 {
-  "enabledPlugins": {
-    "skill-authoring@kyle-skills": true
-  }
+  "enabledPlugins": {}
 }

@@ -1,0 +1,35 @@
+{
+  "name": "skill-authoring",
+  "version": "0.1.0",
+  "description": "스킬을 만들고 검증하는 법",
+  "author": {
+    "name": "kyle-park-io"
+  },
+  "homepage": "https://github.com/kyle-park-io/skills/tree/main/skill-authoring",
+  "repository": "https://github.com/kyle-park-io/skills",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "authoring",
+    "eval",
+    "agents"
+  ],
+  "skills": "./skills/",
+  "hooks": {},
+  "interface": {
+    "displayName": "skill-authoring",
+    "shortDescription": "Write skills that actually trigger, and prove that they do",
+    "longDescription": "스킬을 만들고 검증하는 법",
+    "developerName": "kyle-park-io",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read"
+    ],
+    "defaultPrompt": [
+      "이 반복 작업을 스킬로 만들어줘.",
+      "이 스킬이 왜 발동 안 하는지 봐줘."
+    ],
+    "websiteURL": "https://github.com/kyle-park-io/skills"
+  }
+}

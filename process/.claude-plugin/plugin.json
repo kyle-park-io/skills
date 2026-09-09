@@ -7,5 +7,10 @@
   },
   "homepage": "https://github.com/kyle-park-io/skills/tree/main/process",
   "repository": "https://github.com/kyle-park-io/skills",
-  "license": "MIT"
+  "license": "MIT",
+  "keywords": [
+    "workflow",
+    "handoff",
+    "onboarding"
+  ]
 }

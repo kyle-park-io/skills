@@ -1,0 +1,103 @@
+{
+  "marketplace": {
+    "name": "kyle-skills",
+    "displayName": "Kyle's Skills",
+    "description": "도메인별로 나눈 개인 에이전트 스킬 모음",
+    "repository": "https://github.com/kyle-park-io/skills",
+    "license": "MIT",
+    "author": { "name": "kyle-park-io" }
+  },
+  "domains": [
+    {
+      "name": "architecture",
+      "description": "코드베이스 구조 파악, 다이어그램, ADR",
+      "shortDescription": "Read an existing codebase by symbol, then pin the understanding down",
+      "version": "0.1.0",
+      "claudeCategory": "development",
+      "codexCategory": "Developer Tools",
+      "keywords": ["architecture", "adr", "diagram", "refactoring"],
+      "prompts": [
+        "이 레포의 구조를 파악해줘.",
+        "이 모듈의 의존성을 그려줘."
+      ]
+    },
+    {
+      "name": "backend",
+      "description": "API 경계 설계, 스키마, 마이그레이션",
+      "shortDescription": "API boundaries, schemas, and migrations that survive review",
+      "version": "0.1.0",
+      "claudeCategory": "development",
+      "codexCategory": "Developer Tools",
+      "keywords": ["api", "schema", "migration", "backend"],
+      "prompts": [
+        "이 마이그레이션 검토해줘.",
+        "이 엔드포인트 설계 좀 봐줘."
+      ]
+    },
+    {
+      "name": "frontend",
+      "description": "UI 구현, 성능 진단, 브라우저 검증",
+      "shortDescription": "UI work, measured performance triage, and browser verification",
+      "version": "0.1.0",
+      "claudeCategory": "development",
+      "codexCategory": "Developer Tools",
+      "keywords": ["frontend", "ui", "performance", "accessibility"],
+      "prompts": [
+        "이 화면이 왜 느린지 측정해줘.",
+        "접근성 검증해줘."
+      ]
+    },
+    {
+      "name": "dashboard",
+      "description": "데이터 접근, 차트, BI 도구",
+      "shortDescription": "Reach the data first, then chart it",
+      "version": "0.1.0",
+      "claudeCategory": "monitoring",
+      "codexCategory": "Developer Tools",
+      "keywords": ["dashboard", "analytics", "sql", "bi"],
+      "prompts": [
+        "이 데이터 파일 훑어줘.",
+        "이 지표 정의를 정리해줘."
+      ]
+    },
+    {
+      "name": "infra",
+      "description": "IaC, 배포, 관측, 인시던트",
+      "shortDescription": "Infrastructure as code, deploys, observability, incidents",
+      "version": "0.1.0",
+      "claudeCategory": "deployment",
+      "codexCategory": "Developer Tools",
+      "keywords": ["terraform", "deploy", "observability", "incident"],
+      "prompts": [
+        "이 terraform plan에서 위험한 부분 짚어줘.",
+        "배포 전 체크리스트 돌려줘."
+      ]
+    },
+    {
+      "name": "process",
+      "description": "작업 절차. superpowers가 덮지 못하는 고유 관례",
+      "shortDescription": "The working conventions superpowers does not cover",
+      "version": "0.1.0",
+      "claudeCategory": "productivity",
+      "codexCategory": "Developer Tools",
+      "keywords": ["workflow", "handoff", "onboarding"],
+      "prompts": [
+        "이 세션 핸드오프 노트 남겨줘.",
+        "이 레포 진입 순서 알려줘."
+      ]
+    },
+    {
+      "name": "skill-authoring",
+      "description": "스킬을 만들고 검증하는 법",
+      "shortDescription": "Write skills that actually trigger, and prove that they do",
+      "version": "0.1.0",
+      "claudeCategory": "development",
+      "codexCategory": "Developer Tools",
+      "keywords": ["skills", "authoring", "eval", "agents"],
+      "prompts": [
+        "이 반복 작업을 스킬로 만들어줘.",
+        "이 스킬이 왜 발동 안 하는지 봐줘."
+      ]
+    }
+  ]
+}

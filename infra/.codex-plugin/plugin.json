@@ -1,0 +1,35 @@
+{
+  "name": "infra",
+  "version": "0.1.0",
+  "description": "IaC, 배포, 관측, 인시던트",
+  "author": {
+    "name": "kyle-park-io"
+  },
+  "homepage": "https://github.com/kyle-park-io/skills/tree/main/infra",
+  "repository": "https://github.com/kyle-park-io/skills",
+  "license": "MIT",
+  "keywords": [
+    "terraform",
+    "deploy",
+    "observability",
+    "incident"
+  ],
+  "skills": "./skills/",
+  "hooks": {},
+  "interface": {
+    "displayName": "infra",
+    "shortDescription": "Infrastructure as code, deploys, observability, incidents",
+    "longDescription": "IaC, 배포, 관측, 인시던트",
+    "developerName": "kyle-park-io",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read"
+    ],
+    "defaultPrompt": [
+      "이 terraform plan에서 위험한 부분 짚어줘.",
+      "배포 전 체크리스트 돌려줘."
+    ],
+    "websiteURL": "https://github.com/kyle-park-io/skills"
+  }
+}
