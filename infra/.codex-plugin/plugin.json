@@ -1,6 +1,6 @@
 {
   "name": "infra",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "IaC, 배포, 관측, 인시던트",
   "author": {
     "name": "kyle-park-io"
@@ -15,16 +15,16 @@
     "incident"
   ],
   "skills": "./skills/",
-  "hooks": {},
   "interface": {
-    "displayName": "infra",
+    "displayName": "Infrastructure",
     "shortDescription": "Infrastructure as code, deploys, observability, incidents",
     "longDescription": "IaC, 배포, 관측, 인시던트",
     "developerName": "kyle-park-io",
     "category": "Developer Tools",
     "capabilities": [
       "Interactive",
-      "Read"
+      "Read",
+      "Write"
     ],
     "defaultPrompt": [
       "이 terraform plan에서 위험한 부분 짚어줘.",

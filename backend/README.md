@@ -33,7 +33,11 @@ DB 플러그인을 붙이면 스키마를 직접 읽고 마이그레이션을 �
 ## 설치
 
 ```bash
+# Claude Code
 claude plugin install backend@kyle-skills
+
+# Codex
+codex plugin add backend@kyle-skills
 ```
 
 스킬은 `backend/skills/` 아래에 둔다.

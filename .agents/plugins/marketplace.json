@@ -7,84 +7,84 @@
     {
       "name": "architecture",
       "source": {
-        "source": "url",
-        "url": "./architecture"
+        "source": "local",
+        "path": "./architecture"
       },
       "policy": {
         "installation": "AVAILABLE",
-        "authentication": "NONE"
+        "authentication": "ON_INSTALL"
       },
       "category": "Developer Tools"
     },
     {
       "name": "backend",
       "source": {
-        "source": "url",
-        "url": "./backend"
+        "source": "local",
+        "path": "./backend"
       },
       "policy": {
         "installation": "AVAILABLE",
-        "authentication": "NONE"
+        "authentication": "ON_INSTALL"
       },
       "category": "Developer Tools"
     },
     {
       "name": "frontend",
       "source": {
-        "source": "url",
-        "url": "./frontend"
+        "source": "local",
+        "path": "./frontend"
       },
       "policy": {
         "installation": "AVAILABLE",
-        "authentication": "NONE"
+        "authentication": "ON_INSTALL"
       },
       "category": "Developer Tools"
     },
     {
       "name": "dashboard",
       "source": {
-        "source": "url",
-        "url": "./dashboard"
+        "source": "local",
+        "path": "./dashboard"
       },
       "policy": {
         "installation": "AVAILABLE",
-        "authentication": "NONE"
+        "authentication": "ON_INSTALL"
       },
       "category": "Developer Tools"
     },
     {
       "name": "infra",
       "source": {
-        "source": "url",
-        "url": "./infra"
+        "source": "local",
+        "path": "./infra"
       },
       "policy": {
         "installation": "AVAILABLE",
-        "authentication": "NONE"
+        "authentication": "ON_INSTALL"
       },
       "category": "Developer Tools"
     },
     {
       "name": "process",
       "source": {
-        "source": "url",
-        "url": "./process"
+        "source": "local",
+        "path": "./process"
       },
       "policy": {
         "installation": "AVAILABLE",
-        "authentication": "NONE"
+        "authentication": "ON_INSTALL"
       },
       "category": "Developer Tools"
     },
     {
       "name": "skill-authoring",
       "source": {
-        "source": "url",
-        "url": "./skill-authoring"
+        "source": "local",
+        "path": "./skill-authoring"
       },
       "policy": {
         "installation": "AVAILABLE",
-        "authentication": "NONE"
+        "authentication": "ON_INSTALL"
       },
       "category": "Developer Tools"
     }

@@ -31,7 +31,11 @@
 ## 설치
 
 ```bash
+# Claude Code
 claude plugin install dashboard@kyle-skills
+
+# Codex
+codex plugin add dashboard@kyle-skills
 ```
 
 스킬은 `dashboard/skills/` 아래에 둔다.

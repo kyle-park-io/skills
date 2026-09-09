@@ -9,7 +9,7 @@
     {
       "name": "architecture",
       "description": "코드베이스 구조 파악, 다이어그램, ADR",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "source": "./architecture",
       "category": "development",
       "author": {
@@ -20,7 +20,7 @@
     {
       "name": "backend",
       "description": "API 경계 설계, 스키마, 마이그레이션",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "source": "./backend",
       "category": "development",
       "author": {
@@ -31,7 +31,7 @@
     {
       "name": "frontend",
       "description": "UI 구현, 성능 진단, 브라우저 검증",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "source": "./frontend",
       "category": "development",
       "author": {
@@ -42,7 +42,7 @@
     {
       "name": "dashboard",
       "description": "데이터 접근, 차트, BI 도구",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "source": "./dashboard",
       "category": "monitoring",
       "author": {
@@ -53,7 +53,7 @@
     {
       "name": "infra",
       "description": "IaC, 배포, 관측, 인시던트",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "source": "./infra",
       "category": "deployment",
       "author": {
@@ -64,7 +64,7 @@
     {
       "name": "process",
       "description": "작업 절차. superpowers가 덮지 못하는 고유 관례",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "source": "./process",
       "category": "productivity",
       "author": {
@@ -75,7 +75,7 @@
     {
       "name": "skill-authoring",
       "description": "스킬을 만들고 검증하는 법",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "source": "./skill-authoring",
       "category": "development",
       "author": {

@@ -33,7 +33,11 @@ UI 구현, 성능 진단, 브라우저 검증.
 ## 설치
 
 ```bash
+# Claude Code
 claude plugin install frontend@kyle-skills
+
+# Codex
+codex plugin add frontend@kyle-skills
 ```
 
 스킬은 `frontend/skills/` 아래에 둔다.

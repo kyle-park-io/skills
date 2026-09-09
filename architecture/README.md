@@ -26,7 +26,11 @@
 ## 설치
 
 ```bash
+# Claude Code
 claude plugin install architecture@kyle-skills
+
+# Codex
+codex plugin add architecture@kyle-skills
 ```
 
 스킬은 `architecture/skills/` 아래에 둔다.

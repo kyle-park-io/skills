@@ -33,7 +33,11 @@ IaC 쪽은 반대 문제다. state·잠금·drift 같은 개념이 코드에 안
 ## 설치
 
 ```bash
+# Claude Code
 claude plugin install infra@kyle-skills
+
+# Codex
+codex plugin add infra@kyle-skills
 ```
 
 스킬은 `infra/skills/` 아래에 둔다.

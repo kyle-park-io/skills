@@ -1,7 +1,7 @@
 {
   "name": "process",
   "description": "작업 절차. superpowers가 덮지 못하는 고유 관례",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": {
     "name": "kyle-park-io"
   },

@@ -48,7 +48,11 @@
 ## 설치
 
 ```bash
+# Claude Code
 claude plugin install skill-authoring@kyle-skills
+
+# Codex
+codex plugin add skill-authoring@kyle-skills
 ```
 
 스킬은 `skill-authoring/skills/` 아래에 둔다.

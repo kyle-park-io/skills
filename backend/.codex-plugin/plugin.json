@@ -1,6 +1,6 @@
 {
   "name": "backend",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "API 경계 설계, 스키마, 마이그레이션",
   "author": {
     "name": "kyle-park-io"
@@ -15,16 +15,16 @@
     "backend"
   ],
   "skills": "./skills/",
-  "hooks": {},
   "interface": {
-    "displayName": "backend",
+    "displayName": "Backend",
     "shortDescription": "API boundaries, schemas, and migrations that survive review",
     "longDescription": "API 경계 설계, 스키마, 마이그레이션",
     "developerName": "kyle-park-io",
     "category": "Developer Tools",
     "capabilities": [
       "Interactive",
-      "Read"
+      "Read",
+      "Write"
     ],
     "defaultPrompt": [
       "이 마이그레이션 검토해줘.",

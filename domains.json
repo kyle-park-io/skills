@@ -10,11 +10,13 @@
   "domains": [
     {
       "name": "architecture",
+      "displayName": "Architecture",
       "description": "코드베이스 구조 파악, 다이어그램, ADR",
       "shortDescription": "Read an existing codebase by symbol, then pin the understanding down",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "claudeCategory": "development",
       "codexCategory": "Developer Tools",
+      "capabilities": ["Interactive", "Read", "Write"],
       "keywords": ["architecture", "adr", "diagram", "refactoring"],
       "prompts": [
         "이 레포의 구조를 파악해줘.",
@@ -23,11 +25,13 @@
     },
     {
       "name": "backend",
+      "displayName": "Backend",
       "description": "API 경계 설계, 스키마, 마이그레이션",
       "shortDescription": "API boundaries, schemas, and migrations that survive review",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "claudeCategory": "development",
       "codexCategory": "Developer Tools",
+      "capabilities": ["Interactive", "Read", "Write"],
       "keywords": ["api", "schema", "migration", "backend"],
       "prompts": [
         "이 마이그레이션 검토해줘.",
@@ -36,11 +40,13 @@
     },
     {
       "name": "frontend",
+      "displayName": "Frontend",
       "description": "UI 구현, 성능 진단, 브라우저 검증",
       "shortDescription": "UI work, measured performance triage, and browser verification",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "claudeCategory": "development",
       "codexCategory": "Developer Tools",
+      "capabilities": ["Interactive", "Read", "Write"],
       "keywords": ["frontend", "ui", "performance", "accessibility"],
       "prompts": [
         "이 화면이 왜 느린지 측정해줘.",
@@ -49,11 +55,13 @@
     },
     {
       "name": "dashboard",
+      "displayName": "Dashboard",
       "description": "데이터 접근, 차트, BI 도구",
       "shortDescription": "Reach the data first, then chart it",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "claudeCategory": "monitoring",
       "codexCategory": "Developer Tools",
+      "capabilities": ["Interactive", "Read", "Write"],
       "keywords": ["dashboard", "analytics", "sql", "bi"],
       "prompts": [
         "이 데이터 파일 훑어줘.",
@@ -62,11 +70,13 @@
     },
     {
       "name": "infra",
+      "displayName": "Infrastructure",
       "description": "IaC, 배포, 관측, 인시던트",
       "shortDescription": "Infrastructure as code, deploys, observability, incidents",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "claudeCategory": "deployment",
       "codexCategory": "Developer Tools",
+      "capabilities": ["Interactive", "Read", "Write"],
       "keywords": ["terraform", "deploy", "observability", "incident"],
       "prompts": [
         "이 terraform plan에서 위험한 부분 짚어줘.",
@@ -75,11 +85,13 @@
     },
     {
       "name": "process",
+      "displayName": "Process",
       "description": "작업 절차. superpowers가 덮지 못하는 고유 관례",
       "shortDescription": "The working conventions superpowers does not cover",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "claudeCategory": "productivity",
       "codexCategory": "Developer Tools",
+      "capabilities": ["Interactive", "Read", "Write"],
       "keywords": ["workflow", "handoff", "onboarding"],
       "prompts": [
         "이 세션 핸드오프 노트 남겨줘.",
@@ -88,11 +100,13 @@
     },
     {
       "name": "skill-authoring",
+      "displayName": "Skill Authoring",
       "description": "스킬을 만들고 검증하는 법",
       "shortDescription": "Write skills that actually trigger, and prove that they do",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "claudeCategory": "development",
       "codexCategory": "Developer Tools",
+      "capabilities": ["Interactive", "Read", "Write"],
       "keywords": ["skills", "authoring", "eval", "agents"],
       "prompts": [
         "이 반복 작업을 스킬로 만들어줘.",

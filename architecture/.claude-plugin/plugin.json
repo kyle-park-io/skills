@@ -1,7 +1,7 @@
 {
   "name": "architecture",
   "description": "코드베이스 구조 파악, 다이어그램, ADR",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": {
     "name": "kyle-park-io"
   },

@@ -1,6 +1,6 @@
 {
   "name": "skill-authoring",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "스킬을 만들고 검증하는 법",
   "author": {
     "name": "kyle-park-io"
@@ -15,16 +15,16 @@
     "agents"
   ],
   "skills": "./skills/",
-  "hooks": {},
   "interface": {
-    "displayName": "skill-authoring",
+    "displayName": "Skill Authoring",
     "shortDescription": "Write skills that actually trigger, and prove that they do",
     "longDescription": "스킬을 만들고 검증하는 법",
     "developerName": "kyle-park-io",
     "category": "Developer Tools",
     "capabilities": [
       "Interactive",
-      "Read"
+      "Read",
+      "Write"
     ],
     "defaultPrompt": [
       "이 반복 작업을 스킬로 만들어줘.",

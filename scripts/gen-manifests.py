@@ -9,7 +9,7 @@
 
 생성되는 것:
     .claude-plugin/marketplace.json        Claude Code 마켓플레이스
-    .agents/plugins/marketplace.json       크로스 런타임 마켓플레이스
+    .agents/plugins/marketplace.json       Codex 마켓플레이스
     <domain>/.claude-plugin/plugin.json    Claude Code 플러그인
     <domain>/.codex-plugin/plugin.json     Codex 플러그인
 
@@ -59,8 +59,11 @@ def agents_marketplace(cfg):
         "plugins": [
             {
                 "name": d["name"],
-                "source": {"source": "url", "url": f"./{d['name']}"},
-                "policy": {"installation": "AVAILABLE", "authentication": "NONE"},
+                "source": {"source": "local", "path": f"./{d['name']}"},
+                "policy": {
+                    "installation": "AVAILABLE",
+                    "authentication": "ON_INSTALL",
+                },
                 "category": d["codexCategory"],
             }
             for d in cfg["domains"]
@@ -83,10 +86,11 @@ def claude_plugin(cfg, d):
 
 
 def codex_plugin(cfg, d):
-    """Codex 스키마는 Claude 것과 다르다.
+    """Codex 호환 매니페스트를 만든다.
 
-    skills 경로를 명시해야 하고, hooks 키가 있어야 하며, 표시용 interface
-    블록을 요구한다. 카테고리도 소문자 슬러그가 아니라 표시 문자열이다.
+    이 레포는 Claude Code와 같은 플러그인 루트를 공유하므로 호환 경로인
+    .codex-plugin/plugin.json을 쓴다. skills 경로와 표시용 interface를
+    명시하고, 실제로 제공하지 않는 컴포넌트 키는 넣지 않는다.
     """
     m, repo = cfg["marketplace"], cfg["marketplace"]["repository"]
     return {
@@ -99,14 +103,13 @@ def codex_plugin(cfg, d):
         "license": m["license"],
         "keywords": d["keywords"],
         "skills": "./skills/",
-        "hooks": {},
         "interface": {
-            "displayName": d["name"],
+            "displayName": d["displayName"],
             "shortDescription": d["shortDescription"],
             "longDescription": d["description"],
             "developerName": m["author"]["name"],
             "category": d["codexCategory"],
-            "capabilities": ["Interactive", "Read"],
+            "capabilities": d["capabilities"],
             "defaultPrompt": d["prompts"],
             "websiteURL": repo,
         },

@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "UI 구현, 성능 진단, 브라우저 검증",
   "author": {
     "name": "kyle-park-io"
@@ -15,16 +15,16 @@
     "accessibility"
   ],
   "skills": "./skills/",
-  "hooks": {},
   "interface": {
-    "displayName": "frontend",
+    "displayName": "Frontend",
     "shortDescription": "UI work, measured performance triage, and browser verification",
     "longDescription": "UI 구현, 성능 진단, 브라우저 검증",
     "developerName": "kyle-park-io",
     "category": "Developer Tools",
     "capabilities": [
       "Interactive",
-      "Read"
+      "Read",
+      "Write"
     ],
     "defaultPrompt": [
       "이 화면이 왜 느린지 측정해줘.",
