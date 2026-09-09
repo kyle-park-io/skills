@@ -73,13 +73,18 @@ skill-creator          스킬 제작
 claude-code-setup      레포별 자동화 진단
 claude-md-management   프로젝트 규약 관리
 serena                 시맨틱 코드 분석
+context7               최신 라이브러리 문서 조회
 github                 이슈·PR·CI
 sentry                 에러·스택 트레이스
 ```
 
 DB·클라우드·프레임워크·BI는 **전부 프로젝트 스코프**다. 예외를 두기 시작하면 기준이 무너지고, 무너진 다음에는 다시 세우기 어렵다.
 
+같은 기준을 적용하면 `frontend-design`과 `playwright`도 유저 스코프에서 내려간다. 둘 다 프론트엔드 작업 전용이라 "어느 레포에서든 쓴다"를 통과하지 못한다. `vercel`과 함께 `presets/project/nextjs-vercel`로 옮겼다.
+
 **추가는 한 번에 3~4개까지.** 며칠 써보고 다음 묶음으로 간다. 한꺼번에 20개를 켜면 어느 게 효과였는지 영영 알 수 없다.
+
+복사해서 쓸 설정 원본은 [`presets/`](../presets)에 있다.
 
 ---
 
@@ -180,7 +185,7 @@ DB·클라우드·프레임워크·BI는 **전부 프로젝트 스코프**다. �
 
 `playwright`는 "동작하나"를, `chrome-devtools-mcp`는 "왜 느린가"를 본다. 대체재가 아니다.
 
-- **[있음]** `frontend-design` · `playwright`
+- **[프로젝트 스코프]** `frontend-design` · `playwright` (§3)
 - **[코어]** `chrome-devtools-mcp` · `modern-web-guidance`
 - **[선택]** `figma` · `superdesign`
 

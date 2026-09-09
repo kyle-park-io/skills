@@ -25,3 +25,7 @@ IaC 쪽은 반대 문제다. state·잠금·drift 같은 개념이 코드에 안
 - `deploy-checklist`: 배포 전 확인할 것 (마이그레이션 순서·롤백·피처 플래그)
 - `incident-triage`: 장애 신고를 받았을 때 좁혀가는 순서
 - `tf-review`: Terraform plan을 읽을 때 봐야 할 위험 신호
+
+## 설정 프리셋
+
+이 도메인의 도구는 [`infra-terraform`](../presets/project/infra-terraform) · [`nextjs-vercel`](../presets/project/nextjs-vercel) 프리셋에 들어간다. 적용법은 [`presets/README.md`](../presets)를 본다.

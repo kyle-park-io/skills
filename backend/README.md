@@ -25,3 +25,7 @@ DB 플러그인을 붙이면 스키마를 직접 읽고 마이그레이션을 �
 - `api-design`: 엔드포인트 설계 시 물어야 할 것 (버저닝·에러 형태·페이지네이션)
 - `schema-review`: 마이그레이션 전 확인 목록 (인덱스·NOT NULL·롤백 경로)
 - `idempotency`: 재시도 안전성을 어디에 넣을지
+
+## 설정 프리셋
+
+이 도메인의 도구는 [`backend-postgres`](../presets/project/backend-postgres) 프리셋에 들어간다. 적용법은 [`presets/README.md`](../presets)를 본다.

@@ -25,3 +25,7 @@ UI 구현, 성능 진단, 브라우저 검증.
 - `perf-triage`: 느리다는 신고를 받았을 때 측정 순서 (추측 금지)
 - `a11y-pass`: 머지 전 접근성 최소 검증
 - `component-boundary`: 상태를 어디까지 끌어올릴지의 기준
+
+## 설정 프리셋
+
+이 도메인의 도구는 [`nextjs-vercel`](../presets/project/nextjs-vercel) 프리셋에 들어간다. 적용법은 [`presets/README.md`](../presets)를 본다.

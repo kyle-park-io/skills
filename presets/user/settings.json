@@ -1,0 +1,15 @@
+{
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "claude-code-setup@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "serena@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
+    "sentry@claude-plugins-official": true
+  },
+  "env": {
+    "CONTEXT7_API_KEY": ""
+  }
+}

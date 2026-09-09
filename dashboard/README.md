@@ -23,3 +23,7 @@
 
 - `metric-definition`: 지표를 정의할 때 합의해야 할 것 (분모·기간·중복 제거)
 - `query-cost`: 웨어하우스 쿼리 날리기 전 비용 가늠
+
+## 설정 프리셋
+
+이 도메인의 도구는 [`data-analytics`](../presets/project/data-analytics) 프리셋에 들어간다. 적용법은 [`presets/README.md`](../presets)를 본다.
