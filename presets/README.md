@@ -26,6 +26,38 @@ Codex에서 사용자 전체에 쓸 도메인은 `codex plugin add <도메인>@k
 
 ---
 
+## 새 머신 셋업
+
+노트북을 새로 사면 **이 레포를 클론해도 아무것도 켜지지 않는다.** 프로젝트 스코프는 각 작업 레포에 커밋돼 있어 클론하면 따라오지만, 유저 스코프는 `~/.claude/settings.json`에 있고 그 파일은 어느 레포에도 들어 있지 않다.
+
+순서는 이렇다.
+
+**1. 유저 스코프 설정을 병합한다.**
+
+[`user/settings.json`](user/settings.json)의 `extraKnownMarketplaces`와 `enabledPlugins`를 `~/.claude/settings.json`에 넣는다. **덮어쓰지 않는다.** `model`, `theme`, `effortLevel` 같은 개인 설정이 그 파일에 같이 살기 때문이다.
+
+`extraKnownMarketplaces`가 마켓플레이스 등록을 대신하므로 `claude plugin marketplace add`를 따로 칠 필요가 없다. 이 한 블록이 없으면 `enabledPlugins`의 `@kyle-skills` 항목이 어느 마켓플레이스인지 몰라 해석되지 않는다.
+
+**source는 `github`로 고정한다.** 커밋되는 프리셋에 로컬 절대경로를 넣으면 그 머신 하나를 빼고 전부 틀린 설정이 된다. 이 레포를 직접 고치는 머신만 손으로 `{"source": "directory", "path": "..."}`로 바꿔 푸시 전 스킬을 확인한다. 그건 머신 하나에 대한 예외지 프리셋에 담을 값이 아니다.
+
+공식 플러그인이 안 잡히면 한 번만 등록한다.
+
+```bash
+claude plugin marketplace add anthropics/claude-plugins-official
+```
+
+**2. `env`를 채운다.**
+
+`CONTEXT7_API_KEY`는 레포에 빈 값으로 두었다. [context7.com/dashboard](https://context7.com/dashboard)에서 발급해 넣는다. 비워두면 401이 난다.
+
+**토큰이 든 `settings.json`을 머신 간에 그대로 복사하지 않는다.** 레포의 프리셋을 병합하고 값은 새로 발급하는 쪽이 맞다.
+
+**3. 작업 레포를 클론한다.**
+
+프로젝트 스코프는 여기서 자동으로 붙는다. 커밋된 `<repo>/.claude/settings.json`이 `backend@kyle-skills` 같은 항목을 이미 들고 있고, 1번에서 마켓플레이스를 알려줬으므로 해석된다.
+
+---
+
 ## user/
 
 유저 스코프 원본. 플러그인 10개. 공식 8개와 내 도메인 플러그인 2개다.
@@ -73,7 +105,7 @@ cp -r presets/project/nextjs-vercel/.claude <대상 레포>/
 | `data-analytics` | duckdb-skills · grafana-mcp · pyright-lsp | `dashboard` |
 | `infra-terraform` | terraform · aws-core · semgrep | `infra` |
 
-오른쪽 열은 함께 켜지는 내 도메인 플러그인이다. 프리셋 JSON에 `@kyle-skills`로 들어가 있으므로 [마켓플레이스를 먼저 등록](../README.md#쓰는-법)해야 설치된다.
+오른쪽 열은 함께 켜지는 내 도메인 플러그인이다. 프리셋 JSON에 `@kyle-skills`로 들어가 있으므로 [유저 스코프 설정을 먼저 넣어야](#새-머신-셋업) 해석된다.
 
 ### 바꿔 끼우는 자리
 

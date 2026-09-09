@@ -20,6 +20,8 @@ claude plugin marketplace add kyle-park-io/skills
 codex plugin marketplace add kyle-park-io/skills
 ```
 
+노트북을 새로 샀다면 이 명령 대신 [`presets/README.md` 새 머신 셋업](presets#새-머신-셋업)을 따른다. 유저 스코프 설정 파일 하나에 마켓플레이스 등록과 플러그인 목록이 같이 들어 있다.
+
 Codex는 이 레포의 `.agents/plugins/marketplace.json`을 읽고, 각 도메인의 `.codex-plugin/plugin.json`을 호환 매니페스트로 사용한다. 플러그인을 쓰지 않고 스킬만 가져가려면 사용자 스코프는 `~/.agents/skills/`, 프로젝트 스코프는 `<repo>/.agents/skills/`에 필요한 스킬 폴더만 둔다.
 
 ### 어디서나 쓸 도메인은 유저 스코프로

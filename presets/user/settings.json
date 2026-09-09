@@ -1,4 +1,12 @@
 {
+  "extraKnownMarketplaces": {
+    "kyle-skills": {
+      "source": {
+        "source": "github",
+        "repo": "kyle-park-io/skills"
+      }
+    }
+  },
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
