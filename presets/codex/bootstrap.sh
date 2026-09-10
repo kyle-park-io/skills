@@ -28,7 +28,8 @@ for plugin in \
   "backend@kyle-skills" \
   "dashboard@kyle-skills" \
   "frontend@kyle-skills" \
-  "infra@kyle-skills"
+  "infra@kyle-skills" \
+  "skill-authoring@kyle-skills"
 do
   codex plugin add "$plugin" --json >/dev/null
 done
@@ -39,7 +40,8 @@ python3 "$script_dir/set-plugin-enabled.py" "$codex_config" false \
   "backend@kyle-skills" \
   "dashboard@kyle-skills" \
   "frontend@kyle-skills" \
-  "infra@kyle-skills"
+  "infra@kyle-skills" \
+  "skill-authoring@kyle-skills"
 
 codex plugin marketplace list
 codex plugin list | awk \
@@ -48,4 +50,5 @@ codex plugin list | awk \
    $1 == "backend@kyle-skills" || \
    $1 == "dashboard@kyle-skills" || \
    $1 == "frontend@kyle-skills" || \
-   $1 == "infra@kyle-skills"'
+   $1 == "infra@kyle-skills" || \
+   $1 == "skill-authoring@kyle-skills"'
