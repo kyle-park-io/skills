@@ -84,9 +84,9 @@ claude plugin marketplace add anthropics/claude-plugins-official
 | 키 | 비워두면 | 발급처 |
 |---|---|---|
 | `CONTEXT7_API_KEY` | 익명으로 연결된다. rate limit 만 낮다 | [context7.com/dashboard](https://context7.com/dashboard) |
-| `GITHUB_PERSONAL_ACCESS_TOKEN` | **github MCP 가 400 으로 죽는다** | [github.com/settings/tokens](https://github.com/settings/tokens) |
+| `GITHUB_PERSONAL_ACCESS_TOKEN` | 아무 일도 없다. `github` 이 `false` 라서 | [github.com/settings/tokens](https://github.com/settings/tokens) |
 
-github 은 `Authorization: Bearer ${GITHUB_PERSONAL_ACCESS_TOKEN}` 을 그대로 보내므로 변수가 없으면 빈 Bearer 가 나간다. 토큰을 붙이지 않을 거라면 `enabledPlugins`에서 `github`을 `false`로 내리는 편이 낫다. 죽은 서버를 켜 둘 이유가 없고, `gh` CLI가 인증돼 있으면 이슈·PR·CI는 그쪽으로도 된다. 자세한 것은 SETUP-GUIDE §7.
+`GITHUB_PERSONAL_ACCESS_TOKEN` 은 지금 쓰이는 값이 아니라 **켤 때 채우는 자리**다. github 은 `Authorization: Bearer ${GITHUB_PERSONAL_ACCESS_TOKEN}` 을 그대로 보내므로, 변수를 비워둔 채 플러그인만 `true` 로 올리면 빈 Bearer 가 나가고 서버가 400 으로 끊는다. 둘 다 `settings.json` 에 있으니 **같이 고치고 세션을 다시 띄운다.** 자세한 것은 SETUP-GUIDE §7.
 
 **토큰이 든 `settings.json`을 머신 간에 그대로 복사하지 않는다.** 레포의 프리셋을 병합하고 값은 새로 발급하는 쪽이 맞다.
 
@@ -190,12 +190,13 @@ CLAUDE_FANOUT_ACK=42 python3 scripts/real-trigger-eval.py --eval-set eval.json -
 
 **내 도메인 플러그인도 똑같이 센다.** 아직 비어 있는 `architecture@kyle-skills`는 첫 스킬이 들어온 뒤 추가한다. `skill-authoring@kyle-skills`는 스킬을 쓰는 자리가 이 레포뿐이라 여기 넣지 않고 `skills` 레포의 프로젝트 스코프로 뒀다.
 
-`env`의 키 두 개는 빈 값으로 두었다. `CONTEXT7_API_KEY`는 비워도 익명으로 연결되고 rate limit 만 낮다. `GITHUB_PERSONAL_ACCESS_TOKEN`은 비면 github MCP 가 400 으로 죽는다. 이유는 SETUP-GUIDE §7.
+`env`의 키 두 개는 빈 값으로 두었다. `CONTEXT7_API_KEY`는 비워도 익명으로 연결되고 rate limit 만 낮다. `GITHUB_PERSONAL_ACCESS_TOKEN`은 `github`을 켤 때 채우는 자리다. 비운 채로 켜면 400 으로 죽는다. 이유는 SETUP-GUIDE §7.
 
 ### 지우지 않고 `false`로 적는다
 
 | 플러그인 | 스킬 | 왜 내렸나 |
 |---|---:|---|
+| `github` | 0 (MCP) | 토큰이 있어야 산다. 없으면 빈 `Bearer` 가 나가 400 으로 죽고, `gh` CLI가 인증돼 있으면 이슈·PR·CI는 그쪽으로 된다. 토큰을 넣고 `true`로 되돌린다 (§2) |
 | `vercel` | 33 | 특정 스택 전용. `project/nextjs-vercel`이 다시 켠다 |
 | `telegram` | 2 | 서버가 `bun run`으로 뜬다. bun 이 없는 머신에서는 서버가 죽은 채 스킬 2개만 매 세션 162토큰씩 실린다. 쓰려면 bun 을 먼저 깔고 `true`로 되돌린다 |
 | `frontend-design` | 1 | 프론트엔드 전용. 같은 프로젝트 프리셋으로 |

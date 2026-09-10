@@ -416,7 +416,9 @@ plugin:github:github (400): bad request: Authorization header is badly formatted
 
 context7과 같은 모양이고 결말이 다르다. 설정이 `"Authorization": "Bearer ${GITHUB_PERSONAL_ACCESS_TOKEN}"`인데 변수가 없으면 `Bearer ` 만 나간다. **이쪽 서버는 빈 값을 받아주지 않는다.**
 
-`~/.claude/settings.json`의 `env`에 토큰을 넣거나, 붙이지 않을 거라면 `enabledPlugins`에서 `false`로 내린다. `gh` CLI가 이미 인증돼 있으면 이슈·PR·CI는 그쪽으로도 된다. 죽은 서버를 켜 두면 매 세션 연결 실패만 반복한다.
+**프리셋은 `false`로 내려서 배포한다.** 죽은 서버를 켜 두면 매 세션 연결 실패만 반복하고, `gh` CLI가 인증돼 있으면 이슈·PR·CI는 그쪽으로 되기 때문이다.
+
+쓰려면 `~/.claude/settings.json`에서 `env`의 토큰과 `enabledPlugins`의 `true`를 **같이** 고치고 세션을 다시 띄운다. MCP 연결은 세션 시작 때 한 번 잡히므로, 켜기만 하고 토큰을 나중에 넣으면 그 세션 내내 400이다.
 
 ### 연결 실패 메시지는 원인을 말해주지 않는다
 

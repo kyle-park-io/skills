@@ -14,9 +14,9 @@
     "commit-commands@claude-plugins-official": true,
     "serena@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
-    "github@claude-plugins-official": true,
     "process@kyle-skills": true,
 
+    "github@claude-plugins-official": false,
     "sentry@claude-plugins-official": false,
     "skill-creator@claude-plugins-official": false,
     "telegram@claude-plugins-official": false,
