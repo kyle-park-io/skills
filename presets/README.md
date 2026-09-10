@@ -28,6 +28,8 @@ Codex에서 사용자 전체에 쓸 도메인은 `codex plugin add <도메인>@k
 
 ## 새 머신 셋업
 
+### Claude Code
+
 노트북을 새로 사면 **이 레포를 클론해도 아무것도 켜지지 않는다.** 프로젝트 스코프는 각 작업 레포에 커밋돼 있어 클론하면 따라오지만, 유저 스코프는 `~/.claude/settings.json`에 있고 그 파일은 어느 레포에도 들어 있지 않다.
 
 순서는 이렇다.
@@ -68,6 +70,40 @@ chmod +x ~/.claude/hooks/fanout-cost-gate.sh
 
 프로젝트 스코프는 여기서 자동으로 붙는다. 커밋된 `<repo>/.claude/settings.json`이 `backend@kyle-skills` 같은 항목을 이미 들고 있고, 1번에서 마켓플레이스를 알려줬으므로 해석된다.
 
+### Codex
+
+Codex 플러그인 설치 상태는 사용자 스코프에 있으므로 레포를 클론하는 것만으로
+복구되지 않는다. [`codex/bootstrap.sh`](codex/bootstrap.sh)를 한 번 실행한다.
+
+```bash
+bash presets/codex/bootstrap.sh
+```
+
+이 스크립트는 `kyle-skills` 마켓플레이스와 공통 작업 절차인
+`superpowers@openai-curated-remote`, 실제 스킬이 들어 있는
+`process@kyle-skills`만 멱등하게 설치한다. 아직 비어 있는 `architecture`는
+스킬이 생긴 뒤 목록에 추가한다.
+
+특정 레포에만 둘 자체 스킬은 플러그인으로 전역 설치하지 않고 그 레포의
+`.agents/skills/` 아래에 링크한다. Codex는 이 경로를 상위 디렉터리부터 레포
+루트까지 읽고 심볼릭 링크도 따라간다.
+
+```bash
+mkdir -p <대상 레포>/.agents/skills
+ln -s <이 레포>/backend/skills/schema-review \
+  <대상 레포>/.agents/skills/schema-review
+```
+
+설치 뒤에는 새 대화를 열어 스킬 목록을 다시 적재한다. 확인 명령:
+
+```bash
+codex plugin marketplace list
+codex plugin list
+```
+
+Claude의 `fanout-cost-gate` 훅은 Codex 설정에 적용되지 않는다. Codex로 트리거
+eval을 돌릴 때도 쿼리 수 x `--runs`를 먼저 계산하고 비용을 확인한다.
+
 ---
 
 ## 병렬 실행 비용 훅
@@ -94,6 +130,9 @@ CLAUDE_FANOUT_ACK=42 python3 scripts/real-trigger-eval.py --eval-set eval.json -
 ## user/
 
 유저 스코프 원본. 플러그인 10개. 공식 8개와 내 도메인 플러그인 2개다.
+
+이 디렉터리의 JSON과 훅은 Claude Code 전용이다. Codex의 공통 설치 목록은
+[`codex/bootstrap.sh`](codex/bootstrap.sh)가 맡는다.
 
 **여기 둘 조건은 "언제 쓸지 모른다"가 아니라 "어느 레포에서든 쓴다"다.** 스킬 30개를 넘기지 않는다 (현재 26개). 근거는 [`../docs/SETUP-GUIDE.md`](../docs/SETUP-GUIDE.md) §1, §3.
 

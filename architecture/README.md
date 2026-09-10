@@ -8,6 +8,10 @@
 
 ## 붙일 도구
 
+아래는 역할 카탈로그이며 `architecture@kyle-skills`의 의존성 목록이 아니다.
+Claude Code와 Codex의 카탈로그 이름은 일대일로 대응하지 않으므로 각 하네스에서
+설치 전에 다시 확인한다.
+
 | 도구 | 역할 |
 |---|---|
 | `serena` | 시맨틱 코드 분석 MCP. 심볼 단위 이해·리팩터링 (oraios/serena, 29K) |
@@ -15,6 +19,11 @@
 | `sourcegraph` | 레포 여러 개 걸친 참조 추적 |
 | `code-modernization` | 레거시 해체를 preflight → assess → 실행 구조로 |
 | [`tt-a1i/archify`](https://github.com/tt-a1i/archify) | 아키텍처·시퀀스·데이터플로우 다이어그램 (2026-09 1주차 스타 증가 1위) |
+
+## 현재 상태
+
+이 도메인의 `skills/`는 아직 비어 있다. 현재 플러그인을 설치해도 아키텍처
+스킬이나 위 도구가 함께 설치되지는 않는다.
 
 ## 여기 넣을 스킬 후보
 

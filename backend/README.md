@@ -10,6 +10,11 @@ DB 플러그인을 붙이면 스키마를 직접 읽고 마이그레이션을 �
 
 ## 붙일 도구
 
+아래는 역할 카탈로그다. 2026-09-10 현재 Codex 공식 카탈로그에서는
+`supabase`, `neon-postgres`, `convex`, `auth0`, `redis-development`를 확인했다.
+Claude의 `neon`처럼 이름이 다른 항목이 있으므로 설정을 그대로 복사하지 않는다.
+나머지는 하네스별 설치 경로를 따로 검증한다.
+
 | 도구 | 역할 |
 |---|---|
 | `prisma` / `supabase` / `neon` / `mongodb` / `convex` | **하나만.** 스키마 조회·마이그레이션·쿼리 실행 |

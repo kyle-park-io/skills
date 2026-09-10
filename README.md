@@ -20,7 +20,7 @@ claude plugin marketplace add kyle-park-io/skills
 codex plugin marketplace add kyle-park-io/skills
 ```
 
-노트북을 새로 샀다면 이 명령 대신 [`presets/README.md` 새 머신 셋업](presets#새-머신-셋업)을 따른다. 유저 스코프 설정 파일 하나에 마켓플레이스 등록과 플러그인 목록이 같이 들어 있다.
+노트북을 새로 샀다면 이 명령 대신 [`presets/README.md` 새 머신 셋업](presets#새-머신-셋업)을 따른다. Claude Code는 유저 스코프 설정을 병합하고, Codex는 저장소의 부트스트랩 스크립트로 마켓플레이스와 공통 플러그인을 복구한다.
 
 Codex는 이 레포의 `.agents/plugins/marketplace.json`을 읽고, 각 도메인의 `.codex-plugin/plugin.json`을 호환 매니페스트로 사용한다. 플러그인을 쓰지 않고 스킬만 가져가려면 사용자 스코프는 `~/.agents/skills/`, 프로젝트 스코프는 `<repo>/.agents/skills/`에 필요한 스킬 폴더만 둔다.
 
@@ -107,6 +107,8 @@ skills/
 각 도메인 폴더의 `README.md`는 **카탈로그**다. 그 도메인에서 에이전트가 실패하는 지점, 쓸 만한 공식 플러그인과 OSS 스킬, 그리고 여기 직접 넣을 스킬 후보를 적어둔다.
 
 도메인 `skills/`는 아직 대부분 비어 있다. 지금 들어 있는 건 [`backend/schema-review`](backend/skills/schema-review)와 [`process/project-templates`](process/skills/project-templates) 둘이다. 매니페스트와 설치 경로는 이미 동작하므로, `SKILL.md`를 추가하고 커밋하면 그대로 배포된다.
+
+따라서 현재 `architecture`, `frontend`, `dashboard`, `infra`, `skill-authoring`은 카탈로그와 배포 자리만 있고 설치해도 스킬이 늘지 않는다. 각 도메인 README의 도구 목록은 추천 카탈로그이지 그 도메인 플러그인에 묶여 오는 의존성이 아니다.
 
 설정 파일은 도메인 폴더에 두지 않는다. 레포 하나에는 `.claude/settings.json`이 하나뿐이라 도메인으로 쪼개지지 않기 때문이다. 복사해서 쓸 설정은 [`presets/`](presets)에 스택 단위로 모아뒀다.
 

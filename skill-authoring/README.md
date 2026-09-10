@@ -18,7 +18,9 @@
 
 `skill-creator`의 트리거 eval 은 스킬을 실제로 설치하지 않는다. `.claude/commands/` 에 커맨드 파일을 심어 흉내낸다. **그 프록시는 실물 플러그인 스킬만큼 발동하지 않는다.**
 
-`schema-review`를 같은 쿼리 20개(발동 10 / 무발동 10)로 양쪽에서 쿼리당 3회씩 재봤다.
+`schema-review`를 같은 쿼리 20개(발동 10 / 무발동 10)로 Claude Code의
+프록시와 실물 플러그인에서 쿼리당 3회씩 재봤다. 아래 숫자는 Codex 측정값이
+아니다.
 
 | | 프록시 | 실물 플러그인 |
 |---|---|---|
@@ -34,11 +36,17 @@
 
 ```bash
 python3 scripts/real-trigger-eval.py \
+  --harness claude \
   --eval-set eval.json \
   --project <플러그인을 켜둔 레포> \
   --skill schema-review \
   --out result.json
 ```
+
+Codex에서는 `--harness codex`를 쓴다. 이 경로는 `codex exec --json`에서
+대상 `SKILL.md`를 실제로 읽은 명령을 관측한다. 명시 호출은 호스트가 본문을
+선주입할 수 있으므로 description의 암시 발동 평가에는 넣지 않는다. 결과에는
+하네스, 모델, 스킬 이름을 함께 기록해 서로 다른 환경의 숫자를 섞지 않는다.
 
 측정 조건도 결과를 바꾼다.
 
@@ -58,12 +66,13 @@ python3 scripts/real-trigger-eval.py \
 
 ## 붙일 도구
 
-| 도구 | 역할 |
-|---|---|
-| `skill-creator` | 생성·개선 + **eval 실행 · 변동성 분석 · description 최적화** |
-| `superpowers:writing-skills` | 스킬 작성을 TDD로 |
-| `plugin-dev` | 훅·MCP 통합·마켓플레이스 배포 7개 스킬. 묶어서 배포할 단계면 |
-| `hookify` | 반복 실수를 훅으로 강제. 내장 `update-config`와 겹치니 둘 중 하나만 |
+| 도구 | 가용성 | 역할 |
+|---|---|---|
+| `skill-creator` | 양쪽 기본 제공 | 생성·개선과 기본 검증 |
+| `superpowers:writing-skills` | 양쪽 Superpowers | 스킬 작성을 TDD로 |
+| `plugin-dev` | Claude Code | 훅·MCP 통합·마켓플레이스 배포 7개 스킬. 묶어서 배포할 단계면 |
+| `plugin-creator` | Codex 기본 제공 | 플러그인 골격과 로컬 마켓플레이스 구성 |
+| `hookify` | Claude Code | 반복 실수를 훅으로 강제. 내장 `update-config`와 겹치니 둘 중 하나만 |
 
 ## 변환 도구
 
@@ -78,6 +87,9 @@ python3 scripts/real-trigger-eval.py \
 외부 스킬은 [`NVIDIA/SkillSpector`](https://github.com/NVIDIA/SkillSpector)로 스캔한 뒤에 넣는다. 루트 README의 절차 참조.
 
 ## 설치
+
+이 도메인의 `skills/`는 아직 비어 있다. 지금은 양쪽의 기본 `skill-creator`와
+하네스별 플러그인 도구를 쓰며, 자체 규칙이 생긴 뒤 이 플러그인을 설치한다.
 
 ```bash
 # Claude Code

@@ -4,7 +4,9 @@
 
 > **마지막 검증**: 2026-09-09 에 `mantle-kr-herald` 에서 뽑음. **2026-09-10 에 `jarvis` 에 PR 제목 검사만 적용해 CI 통과 확인** — PR #20, run `34436822886`, 스텝이 실제로 돌아 `PR title OK: ...` 를 찍었다 (`PR_TITLE` 이 비면 exit 1 이므로 배선까지 증명된다).
 >
-> **단 파일을 복사한 게 아니다.** jarvis 에 이미 있던 `ci.yml` 에 스텝 하나를 손으로 옮겼고, `typecheck:web` 절반은 조건이 안 맞아 쓰지 않았다. **`files/` 를 통째로 복사해본 적은 아직 없다** — 액션 버전과 `node-version: 24` 는 여전히 검증 안 된 값이다 (jarvis 는 Node 22 를 쓴다).
+> **2026-09-10: `files/scripts/check-pr-title.js` 가 조각에 들어왔다.** jarvis 에서 이 스텝을 실제로 붙이려면 스크립트를 새로 써야 했고, 그 결과물을 되가져왔다. 그전까지 이 조각의 `ci.yml` 은 **존재하지 않는 스크립트를 부르고 있었다.**
+>
+> **단 `ci.yml` 파일을 복사한 게 아니다.** jarvis 에 이미 있던 `ci.yml` 에 스텝 하나를 손으로 옮겼고, `typecheck:web` 절반은 조건이 안 맞아 쓰지 않았다. **`files/` 를 통째로 복사해본 적은 아직 없다** — 액션 버전과 `node-version: 24` 는 여전히 검증 안 된 값이다 (jarvis 는 Node 22 를 쓴다).
 >
 > 썩는 값: `actions/checkout@v4`, `actions/setup-node@v4`, `pnpm/action-setup@v4`, `node-version: 24`. 액션 메이저 버전과 Node 버전은 시간이 지나면 틀려지고, **틀려도 조용히 경고만 뜬다.** 쓰기 전에 현재 버전을 확인한다.
 
@@ -33,6 +35,14 @@ squash merge 를 쓰면 **PR 제목이 그대로 main 의 커밋 제목이 된�
 - **별도 job 이 아니라 `test` job 안에 둔다.** main 의 required status check 가 `test` 하나뿐이었다. 새 job 을 만들면 통과 여부가 표시는 되지만 강제되지 않는다. 누군가 required 목록에 손으로 추가하기 전까지는 그냥 초록색 장식이다
 - **제목을 env 로 넘긴다.** `run:` 안에 `${{ }}` 로 보간하면 백틱이나 `$(...)` 가 든 제목이 러너에서 실행된다. 제목은 외부 입력이다
 
+#### 규칙은 "ASCII 만" 이 아니다
+
+`jarvis` 에 붙이면서 드러났다. 그 레포의 영어 제목들은 `—` (U+2014) 와 `→` (U+2192) 를 쓴다 (`feat: Phase 2 execution — jarvis do → draft PR`). ASCII 로 잡으면 **자기 히스토리 20개 중 3개가 떨어진다.** herald 가 당한 것은 한글이었으므로 검사 대상도 한글/CJK 여야 한다. 잡으려는 것이 "비-ASCII" 가 아니라 "영어가 아닌 것" 이라는 게 요점이다.
+
+#### 검사기가 조용히 고장 나는 경우
+
+규칙이 정규식 한 줄이라 깨지면 **전부 통과시키면서 초록색으로 보인다** — 이 스텝이 막으려는 바로 그 종류의 실패가 검사기 자신에게 생긴다. 그래서 스크립트가 자기 픽스처를 매 실행마다 검사하고, 어긋나면 exit 2 로 죽는다.
+
 ### `typecheck:web`
 
 두 사실이 겹칠 때만 생기는 구멍이다.
@@ -48,7 +58,8 @@ squash merge 를 쓰면 **PR 제목이 그대로 main 의 커밋 제목이 된�
 |---|---|
 | `pnpm/action-setup@v4` 의 버전 출처 | **둘 중 하나는 있어야 한다.** 조각의 파일은 `package.json` 의 `packageManager` 필드에서 읽는 쪽을 쓴다 (파일 주석 참조). 대상 레포에 그 필드가 없으면 액션에 `version:` 을 직접 박는다 — `jarvis` 가 `version: 11` 로 그렇게 한다 (2026-09-10 관찰) |
 | `node-version: 24` | 대상 레포의 Node 버전. **pnpm 메이저가 요구하는 최소 Node 를 먼저 확인한다** — `jarvis` 는 `ci: use Node 22 (required by pnpm 11)` 로 이 이유 때문에 한 번 올렸다 (커밋 `f8aee63`) |
-| `pnpm check:pr-title` | **스크립트를 직접 써야 한다.** 조각에 안 들어 있다. `process.env.PR_TITLE` 을 읽어 그 레포가 원하는 규칙을 검사한다 |
+| `scripts/check-pr-title.js` 의 **규칙** | 스크립트 자체는 이제 조각에 들어 있다 (`files/scripts/`). 바꿀 것은 `CJK` 와 `CONVENTIONAL` 두 줄 — jarvis/herald 의 규칙(영어 + Conventional Commits)이다. **`FIXTURES` 도 같이 고친다**, 안 그러면 스크립트가 자기 자신을 떨어뜨린다 |
+| `package.json` 의 `scripts` | `"check:pr-title": "node scripts/check-pr-title.js"` 를 추가해야 워크플로의 `pnpm check:pr-title` 이 붙는다. 이 한 줄이 빠지면 CI 는 조각 탓이 아니라 그 이유로 깨진다 |
 | `pnpm typecheck:web` | `web` 을 실제 하위 디렉터리 이름으로. tsconfig 가 여러 개면 스텝을 그만큼 늘린다 |
 | `branches: [main]` | 기본 브랜치 이름이 다르면 |
 

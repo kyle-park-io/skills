@@ -29,13 +29,23 @@
 
 ```bash
 python3 scripts/real-trigger-eval.py \
+    --harness claude \
     --eval-set evals/<스킬>.json \
     --project <플러그인을 켜둔 레포> \
     --skill <스킬 이름> \
     --out /tmp/result.json
 ```
 
-**비용을 먼저 본다.** 쿼리 수 곱하기 `--runs` 만큼 독립 세션이 뜬다. `fanout-cost-gate` 훅이 그 수를 계산해 막으므로, `CLAUDE_FANOUT_ACK=<세션 수>` 없이는 실행되지 않는다. 근거는 [`../presets/README.md`](../presets/README.md#병렬-실행-비용-훅).
+Codex를 잴 때는 `--harness codex`를 쓴다. 모델을 생략하면 현재 Codex 설정값을
+사용한다. Codex는 암시 발동 뒤 실행한 `SKILL.md` 읽기 명령을 JSONL에서
+관측한다. `$skill-name` 같은 명시 호출은 호스트가 본문을 미리 넣어 읽기 이벤트가
+없을 수 있으므로 이 평가의 대상이 아니다.
+
+**비용을 먼저 본다.** 쿼리 수 곱하기 `--runs` 만큼 독립 세션이 뜬다. Claude
+Code에서는 `fanout-cost-gate` 훅이 그 수를 계산해 막으므로,
+`CLAUDE_FANOUT_ACK=<세션 수>` 없이는 실행되지 않는다. Codex에는 이 Claude
+훅이 적용되지 않으므로 실행자가 같은 계산을 직접 확인한다. 근거는
+[`../presets/README.md`](../presets/README.md#병렬-실행-비용-훅).
 
 ## 언제 돌리나
 
@@ -43,10 +53,10 @@ python3 scripts/real-trigger-eval.py \
 
 ## 측정 기록
 
-| 스킬 | 날짜 | 모델 | 쿼리 | 반복 | accuracy | precision | recall |
-|---|---|---|---|---|---|---|---|
-| `project-templates` | 2026-09-09 | `claude-opus-5` | 14 | 3 | 1.0 | 1.0 | 1.0 |
-| `schema-review` | 2026-09-09 | `claude-opus-5` | 20 | 3 | 1.0 | - | 1.0 |
+| 스킬 | 날짜 | 하네스 | 모델 | 쿼리 | 반복 | accuracy | precision | recall |
+|---|---|---|---|---|---|---|---|---|
+| `project-templates` | 2026-09-09 | Claude Code | `claude-opus-5` | 14 | 3 | 1.0 | 1.0 | 1.0 |
+| `schema-review` | 2026-09-09 | Claude Code | `claude-opus-5` | 20 | 3 | 1.0 | - | 1.0 |
 
 `project-templates` 는 **경계에 걸린 쿼리가 하나도 없었다.** 양성 7개가 전부 3/3, 음성 7개가 전부 0/3 이다. 1/3 이나 2/3 이 나오는 쿼리가 `description` 의 애매한 표현을 가리키는데, 그게 없었다.
 

@@ -31,6 +31,8 @@ pnpm 워크스페이스 TypeScript 모노레포. 네이티브 애드온 의존�
 
 ### PR 제목 검사 (`ci-pnpm-vitest`)
 
+> 여기서 쓴 스크립트는 2026-09-10 에 조각으로 되돌아갔다 (`ci-pnpm-vitest/files/scripts/check-pr-title.js`). 다음 레포는 새로 쓰지 않는다.
+
 **조건이 세 개 다 맞아서 넣었다** — `jarvis` PR #20, 2026-09-10. 확인한 상태:
 
 | 조각이 요구하는 조건 | 이 스택에서 |
@@ -65,7 +67,6 @@ herald 에서는 사람이 PR 제목을 타이핑했다. 여기서는 프로그�
 새 레포를 이 스택으로 세울 때 이 레시피로 안 되는 것들. 조각으로 만들 근거가 아직 없어서 빠진 것이지 필요 없어서가 아니다.
 
 - 네이티브 빌드 감지 테스트 본체 (`pnpm-native-build-allowlist` 의 "바꿔야 할 것" 참조)
-- `check:pr-title` 스크립트 본체 (`ci-pnpm-vitest` 의 "바꿔야 할 것" 참조)
 - `tsconfig.base.json`, `.gitignore`, 패키지별 `tsconfig.json`. `jarvis` 에서 관문 1 또는 2 에 걸렸다 — 아래 참조
 
 ### 관문에 떨어진 것 (`jarvis`, 2026-09-10)

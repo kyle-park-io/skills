@@ -2,9 +2,9 @@
 
 이 레포의 스킬을 어떤 전제 위에서 운영하는지 적어둔 문서다. 선택지를 늘어놓은 비교표가 아니라 **이미 내린 결정과 그 근거**의 기록이다. 새 스킬이나 플러그인을 추가할지 판단할 때 여기 적힌 기준을 먼저 통과시킨다.
 
-측정 기준일 2026-09-09 · 하네스 Claude Code
+측정 기준일 Claude Code 2026-09-09 · Codex CLI 2026-09-10 (0.153.4)
 
-이 문서의 플러그인 수, 내장 스킬 수, `superpowers` 구성, `.claude/settings.json`, MCP 문제 해결은 Claude Code에서 측정한 운영 기준이다. Codex에도 컨텍스트 예산 원칙은 적용하지만 내장 및 설치된 스킬 목록은 현재 Codex 환경에서 별도로 센다. 자체 스킬은 같은 `SKILL.md`를 공유하고, 사용자 스코프는 `~/.agents/skills/`, 프로젝트 스코프는 `<repo>/.agents/skills/`를 쓴다. Codex 플러그인 설치와 갱신 명령은 루트 [`README.md`](../README.md#쓰는-법)에 정리했다.
+§1에서 §3까지의 플러그인 수와 내장 스킬 수, `.claude/settings.json`, MCP 문제 해결은 Claude Code에서 측정한 운영 기준이다. Codex에도 컨텍스트 예산 원칙은 적용하지만 내장 및 설치된 스킬 목록은 현재 환경에서 별도로 센다. 자체 스킬은 같은 `SKILL.md`를 공유하고, 사용자 스코프는 `~/.agents/skills/`, 프로젝트 스코프는 `<repo>/.agents/skills/`를 쓴다. Codex 플러그인 설치와 갱신 명령은 루트 [`README.md`](../README.md#쓰는-법)에 정리했다.
 
 ---
 
@@ -111,8 +111,8 @@ DB·클라우드·프레임워크·BI는 **전부 프로젝트 스코프**다. �
 새 플러그인을 고르기 전에 이 두 계층에 있는지부터 확인한다. 이것만으로 설치 후보의 절반이 걸러진다.
 
 ```
-① Claude Code 내장 16개  하네스 기본기, 손댈 것 없음
-② superpowers 14개  작업 절차 ("어떻게 일할지")
+① 하네스 기본기         Claude Code 내장 / Codex 시스템 스킬과 AGENTS.md
+② superpowers 14개      양쪽에서 쓰는 작업 절차 ("어떻게 일할지")
 ③ 도메인 플러그인    ← 여기만 비어 있다 ("무엇을 아는지")
 ```
 
@@ -163,6 +163,23 @@ DB·클라우드·프레임워크·BI는 **전부 프로젝트 스코프**다. �
 
 ### ② superpowers 14개는 전부 절차다
 
+Claude Code뿐 아니라 Codex 공식 카탈로그에도 같은 v6.3.0과 아래 14개 스킬이
+있다. Codex판에는 서브에이전트와 worktree 동작을 현재 하네스에 맞추는 참고자료도
+포함된다. 자체 `process` 도메인에 복제하지 않고 공통 기반으로 설치한다.
+
+```bash
+codex plugin add superpowers@openai-curated-remote
+```
+
+Codex의 서브에이전트는 현재 릴리스에서 기본 지원되지만, 실제 도구 목록이 문서나
+오래된 설정 예시보다 우선한다. 도구가 없을 때만 현재 Codex 설정을 확인한다.
+
+`using-superpowers`는 모든 대화를, `brainstorming`과
+`test-driven-development`는 넓은 개발 요청을 대상으로 한다. 이 강한 개입은
+의도된 작업 방식이다. 빠른 일회성 수정에도 그 절차를 적용할 생각이 없다면
+유저 스코프에 설치하지 않는다. 이 레포에서는 Claude와 Codex의 작업 방식을
+맞추기 위해 유저 스코프 공통 기반으로 쓴다.
+
 | 단계 | 스킬 |
 |---|---|
 | 설계 | `brainstorming` · `writing-plans` · `using-git-worktrees` · `using-superpowers` |
@@ -203,13 +220,16 @@ DB·클라우드·프레임워크·BI는 **전부 프로젝트 스코프**다. �
 
 `playwright`는 "동작하나"를, `chrome-devtools-mcp`는 "왜 느린가"를 본다. 대체재가 아니다.
 
-- **[프로젝트 스코프]** `frontend-design` · `playwright` (§3)
-- **[코어]** `chrome-devtools-mcp` · `modern-web-guidance`
-- **[선택]** `figma` · `superdesign`
+- **[Claude 프로젝트 스코프]** `frontend-design` · `playwright` (§3)
+- **[Claude 코어]** `chrome-devtools-mcp` · `modern-web-guidance`
+- **[Codex 카탈로그]** `frontend-design-premium` · `figma` · `superdesign` · `vercel`
+- **[Codex 별도 구성]** Playwright와 Chrome DevTools는 공식 카탈로그에 같은 이름이 없으므로 프로젝트 의존성이나 MCP로 직접 붙이고 검증
 
 ### [dashboard](../dashboard) · 부분
 
-차트를 **그리는** 능력은 내장 `dataviz`가 이미 갖고 있다. 비는 건 **데이터에 닿는 경로**다.
+Claude Code에서는 차트를 **그리는** 능력을 내장 `dataviz`가 이미 갖고 있다.
+Codex에서는 현재 세션의 스킬 목록을 확인한다. 비는 건 공통적으로
+**데이터에 닿는 경로**다.
 
 - **[있음]** `dataviz` (내장)
 - **[코어]** `duckdb-skills`: 셋업 비용 0, 가장 범용적
@@ -226,13 +246,16 @@ DB·클라우드·프레임워크·BI는 **전부 프로젝트 스코프**다. �
 
 ### [process](../process) · 기반 있음
 
-- **[있음]** `superpowers` · `claude-code-setup`
-- **[코어]** `claude-md-management` · `mattpocock-skills`
+- **[양쪽 공통]** `superpowers`
+- **[Claude 있음]** `claude-code-setup`
+- **[Claude 코어]** `claude-md-management` · `mattpocock-skills`
+- **[Codex 기본기]** `AGENTS.md` · 시스템 스킬 · 서브에이전트
 
 ### [skill-authoring](../skill-authoring) · 기반 있음
 
-- **[있음]** `skill-creator` · `superpowers:writing-skills`
-- **[코어]** `plugin-dev`
+- **[양쪽 공통]** `skill-creator` · `superpowers:writing-skills`
+- **[Claude 코어]** `plugin-dev`
+- **[Codex 기본기]** `plugin-creator`
 
 ---
 

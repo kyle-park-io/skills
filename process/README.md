@@ -4,7 +4,9 @@
 
 ## 이미 덮여 있는 것
 
-아래 목록은 Claude Code 환경에서 확인한 기준이다. `superpowers` 14개 스킬이 소프트웨어 작업의 4단계를 전부 덮는다. Codex에서는 현재 세션에 설치된 스킬을 따로 확인한다.
+`superpowers` v6.3.0은 Claude Code와 Codex 공식 카탈로그에 같은 14개
+스킬을 제공한다. 소프트웨어 작업의 4단계를 공통으로 덮으므로 이 도메인에는
+그 절차를 복제하지 않는다. 다만 실제 설치 상태는 하네스마다 따로 확인한다.
 
 | 단계 | 스킬 |
 |---|---|
@@ -15,9 +17,20 @@
 
 여기에 Claude Code 내장 `code-review` · `simplify` · `security-review` · `run`이 실행 도구로 붙는다.
 
+Codex에서는 시스템 스킬, `AGENTS.md`, 서브에이전트가 하네스 기본기로 붙는다.
+`superpowers`가 명시한 병렬 실행 절차는 현재 도구 목록에 서브에이전트가 있을
+때만 따른다. 설치 명령은 다음과 같다.
+
+```bash
+codex plugin add superpowers@openai-curated-remote
+```
+
 내장 `code-review`와 `superpowers:requesting-code-review`는 **겹치지 않는다.** 전자는 diff를 직접 훑는 *실행 도구*, 후자는 리뷰어 서브에이전트를 *디스패치하는 절차*다.
 
 ## 보강할 것
+
+아래 이름은 Claude Code에서 확인한 카탈로그다. Codex에서는 `AGENTS.md`와
+기본 스킬이 일부 역할을 맡으며, 같은 이름의 플러그인이 있다고 가정하지 않는다.
 
 | 도구 | 역할 |
 |---|---|

@@ -6,20 +6,26 @@
 실물로는 7초 만에 뜨는 스킬이 프록시로는 한 번도 안 뜨는 일이 생긴다.
 그래서 프록시로 잰 발동률은 스킬의 발동률이 아니다.
 
-여기서는 플러그인을 실제로 켜둔 프로젝트에서 `claude -p` 를 돌리고
-스트림에서 Skill 툴 호출을 직접 관측한다.
+여기서는 플러그인을 실제로 켜둔 프로젝트에서 Claude Code 또는 Codex 를
+비대화형으로 돌리고, 스트림에서 대상 스킬이 실제로 열린 것을 관측한다.
 
 사용법:
 
     python3 scripts/real-trigger-eval.py \\
+        --harness claude \\
         --eval-set evals/<스킬>.json \\
         --project <플러그인을 켜둔 레포 경로> \\
         --skill schema-review \\
         --out result.json
 
-`--project` 는 대상 스킬의 도메인 플러그인이 `.claude/settings.json` 에
-켜져 있고, 스킬이 다룰 코드가 실제로 들어 있는 레포여야 한다. 빈
-디렉터리에서 재면 발동률이 실제보다 낮게 나온다.
+`--project` 는 대상 스킬이 실제로 설치된 상태이고, 스킬이 다룰 코드가
+들어 있는 레포여야 한다. Claude Code 는 프로젝트의 `.claude/settings.json`,
+Codex 는 사용자 플러그인 설치 상태나 프로젝트의 `.agents/skills/` 를 쓴다.
+빈 디렉터리에서 재면 발동률이 실제보다 낮게 나온다.
+
+명시 호출은 재지 않는다. `$skill-name` 처럼 직접 부르면 Codex 호스트가 턴을
+시작하기 전에 본문을 넣을 수 있어 JSONL 에 파일 읽기 이벤트가 남지 않는다.
+이 스크립트의 목적은 description 에 의한 암시 발동을 재는 것이다.
 
 쿼리 셋은 `evals/<스킬>.json` 에 둔다. 스킬 폴더 안에 두면 플러그인
 페이로드로 딸려 나가 설치자에게 쓸모없는 파일이 된다. 형식과 음성 쿼리를
@@ -64,7 +70,16 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 
 
-def run_once(query, cwd, skill, model, timeout, max_turns):
+def codex_event_triggered(event, skill):
+    """Codex JSONL 이벤트가 대상 SKILL.md 를 실제로 연 명령인지 본다."""
+    item = event.get("item", {})
+    if item.get("type") != "command_execution":
+        return False
+    command = item.get("command", "").replace("\\\\", "/")
+    return f"/{skill}/SKILL.md" in command
+
+
+def run_claude_once(query, cwd, skill, model, timeout, max_turns):
     """쿼리 하나를 돌리고 대상 스킬이 열렸는지 반환한다.
 
     런은 두 가지 조건에서 즉시 끝난다. 둘 다 측정에 아무것도 더하지 않는 구간을
@@ -82,7 +97,8 @@ def run_once(query, cwd, skill, model, timeout, max_turns):
     proc = subprocess.Popen(
         ["claude", "-p", query, "--model", model,
          "--output-format", "stream-json", "--verbose"],
-        stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, cwd=cwd, env=env)
+        stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL, cwd=cwd, env=env, text=True)
     triggered = False
     turns = 0
     deadline = time.time() + timeout
@@ -112,10 +128,51 @@ def run_once(query, cwd, skill, model, timeout, max_turns):
     return triggered
 
 
+def run_codex_once(query, cwd, skill, model, timeout):
+    """Codex JSONL 에서 대상 스킬 본문을 연 command_execution 을 찾는다."""
+    command = [
+        "codex", "exec", "--ephemeral", "--json", "--sandbox", "read-only",
+        "-C", cwd,
+    ]
+    if model:
+        command.extend(["--model", model])
+    command.append(query)
+
+    proc = subprocess.Popen(
+        command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL, cwd=cwd, text=True)
+    triggered = False
+    deadline = time.time() + timeout
+    try:
+        for raw in proc.stdout:
+            if time.time() > deadline:
+                break
+            try:
+                event = json.loads(raw)
+            except json.JSONDecodeError:
+                continue
+            if codex_event_triggered(event, skill):
+                triggered = True
+                break
+            if event.get("type") == "turn.completed":
+                break
+    finally:
+        if proc.poll() is None:
+            proc.kill()
+        proc.wait()
+    return triggered
+
+
+def run_once(query, cwd, skill, harness, model, timeout, max_turns):
+    if harness == "claude":
+        return run_claude_once(query, cwd, skill, model, timeout, max_turns)
+    return run_codex_once(query, cwd, skill, model, timeout)
+
+
 def evaluate(item, args):
     """쿼리 하나를 여러 번 돌려 과반으로 발동 여부를 정한다."""
     started = time.time()
-    hits = sum(run_once(item["query"], args.project, args.skill,
+    hits = sum(run_once(item["query"], args.project, args.skill, args.harness,
                         args.model, args.timeout, args.max_turns)
                for _ in range(args.runs))
     fired = hits > args.runs // 2
@@ -148,24 +205,37 @@ def summarize(results):
 def main():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--harness", choices=("claude", "codex"),
+                        default="claude", help="측정할 하네스 (기본: claude)")
     parser.add_argument("--eval-set", required=True, help="쿼리 JSON 경로")
     parser.add_argument("--project", required=True, help="플러그인을 켜둔 레포 경로")
     parser.add_argument("--skill", required=True, help="측정할 스킬 이름")
     parser.add_argument("--out", required=True, help="결과 JSON 경로")
-    parser.add_argument("--model", default="claude-opus-5")
+    parser.add_argument("--model", help="모델. 생략하면 Claude는 claude-opus-5, "
+                                        "Codex는 현재 설정값을 쓴다")
     parser.add_argument("--runs", type=int, default=3, help="쿼리당 반복 횟수")
     parser.add_argument("--workers", type=int, default=6)
     parser.add_argument("--timeout", type=int, default=300,
                         help="런 하나의 상한 초. 짧게 잡으면 발동을 놓친다")
     parser.add_argument("--max-turns", type=int, default=6,
-                        help="스킬 없이 이 턴을 넘기면 미발동으로 끊는다. "
-                             "스킬 선택은 첫 턴의 판단이라 여유를 크게 줄 이유가 없다")
+                        help="Claude에서 스킬 없이 이 턴을 넘기면 미발동으로 끊는다. "
+                             "Codex exec는 한 턴이라 이 값을 쓰지 않는다")
     args = parser.parse_args()
 
-    settings = os.path.join(args.project, ".claude", "settings.json")
-    if not os.path.exists(settings):
-        print(f"경고: {settings} 가 없다. 플러그인이 켜져 있는지 확인한다.",
-              file=sys.stderr)
+    if args.model is None and args.harness == "claude":
+        args.model = "claude-opus-5"
+
+    if args.harness == "claude":
+        settings = os.path.join(args.project, ".claude", "settings.json")
+        if not os.path.exists(settings):
+            print(f"경고: {settings} 가 없다. 플러그인이 켜져 있는지 확인한다.",
+                  file=sys.stderr)
+    else:
+        repo_skills = os.path.join(args.project, ".agents", "skills")
+        if not os.path.exists(repo_skills):
+            print("알림: 프로젝트 .agents/skills 가 없다. 사용자 스코프에 대상 "
+                  "플러그인이 설치되어 있는지 `codex plugin list` 로 확인한다.",
+                  file=sys.stderr)
 
     items = json.load(open(args.eval_set))
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
@@ -173,8 +243,13 @@ def main():
 
     summary = summarize(results)
     with open(args.out, "w") as f:
-        json.dump({"summary": summary, "results": results}, f,
-                  ensure_ascii=False, indent=2)
+        json.dump({
+            "harness": args.harness,
+            "model": args.model or "configured-default",
+            "skill": args.skill,
+            "summary": summary,
+            "results": results,
+        }, f, ensure_ascii=False, indent=2)
     print("SUMMARY " + json.dumps(summary), flush=True)
 
 
