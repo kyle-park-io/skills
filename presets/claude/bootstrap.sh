@@ -2,17 +2,24 @@
 # Claude Code 유저 스코프를 이 레포의 프리셋으로 맞춘다.
 #
 # 왜 있는가
-#   Codex 와 달리 Claude 셋업은 선언적 JSON 병합이라 스크립트 없이도 되는 것처럼
-#   보인다. 실제로 마켓플레이스와 플러그인은 그렇다. 그렇지 않은 단계가 훅
-#   복사 하나뿐인데, 하필 그것이 병렬 실행 비용 게이트다.
+#   Claude 셋업은 선언적 JSON 병합이라 스크립트 없이도 되는 것처럼 보인다.
+#   유저 스코프만 보면 맞다. 병합으로 안 되는 단계가 둘 있다.
 #
-#   그 한 단계를 손에 맡긴 결과가 2026-09-09 이다. 게이트를 레포에 만들어 두고,
+#   훅 복사가 하나다. 파일 시스템 작업이고, 하필 그것이 병렬 실행 비용
+#   게이트다. 손에 맡긴 결과가 2026-09-09 이다. 게이트를 레포에 만들어 두고,
 #   게이트가 없는 머신에서 Opus 세션 42개를 띄워 사용량 한도를 태웠다.
+#
+#   프로젝트 스코프가 켜는 플러그인의 캐시 설치가 나머지 하나다. 유저 캐시에
+#   없는 플러그인을 프로젝트 설정이 켜면 세션 시작 때 로드 에러로 떨어진다.
+#   `skills` 레포가 `skill-authoring` 으로 그 상태였다.
 #
 # 순서가 중요하다
 #   훅 파일을 먼저 복사하고 설정을 나중에 병합한다. 반대로 하면 settings.json 이
 #   없는 스크립트를 가리키는 구간이 생기고, 그 사이 모든 Bash 호출이 그것을
 #   실행하려 든다. 부분 적용이 아무것도 안 한 것보다 나쁜 유일한 지점이다.
+#
+#   캐시 설치도 병합보다 앞이다. `claude plugin install` 은 설치한 플러그인을
+#   유저 스코프에서 켜고 나간다. 병합이 뒤에 와야 프리셋의 `false` 가 남는다.
 
 set -eu
 
@@ -23,7 +30,7 @@ settings="$claude_home/settings.json"
 
 cd "$repo_root"
 
-for dependency in python3 jq; do
+for dependency in python3 jq claude; do
   command -v "$dependency" >/dev/null || {
     echo "필요한 명령이 없다: $dependency" >&2
     exit 1
@@ -35,12 +42,41 @@ mkdir -p "$claude_home/hooks"
 install -m 755 presets/user/hooks/fanout-cost-gate.sh "$claude_home/hooks/"
 echo "훅 설치: $claude_home/hooks/fanout-cost-gate.sh"
 
-# 2. 설정을 병합한다. 실제로 바뀔 때만 백업이 남는다.
+# 2. 프로젝트 스코프가 켜는 플러그인을 유저 캐시에 깐다.
+#
+#    유저 스코프에서 켜는 플러그인은 병합만으로 설치된다. 프로젝트 스코프는
+#    그렇지 않다. Codex 가 `codex plugin add` 로 메우는 자리와 같다.
+#    이미 있는 것은 건너뛴다. `claude plugin install` 은 멱등하지만 매번 유저
+#    스코프를 `true` 로 되돌려 놓아서, 그냥 돌리면 3단계가 매 실행마다 다섯 줄을
+#    `true -> false` 로 찍고 백업을 남긴다. 바뀐 것만 찍혀야 출력이 검증이 된다.
+echo
+echo "캐시 설치"
+claude plugin marketplace add kyle-park-io/skills >/dev/null
+installed=$(claude plugin list --json | jq -r '.[] | select(.scope == "user") | .id')
+for plugin in \
+  "backend@kyle-skills" \
+  "dashboard@kyle-skills" \
+  "frontend@kyle-skills" \
+  "infra@kyle-skills" \
+  "skill-authoring@kyle-skills"
+do
+  if printf '%s\n' "$installed" | grep -qxF "$plugin"; then
+    echo "  $plugin (이미 있음)"
+    continue
+  fi
+  claude plugin install "$plugin" >/dev/null
+  echo "  $plugin 설치"
+done
+
+# 3. 설정을 병합한다. 실제로 바뀔 때만 백업이 남는다.
+#
+#    2단계가 켜 둔 도메인 플러그인이 여기서 프리셋의 `false` 로 되돌아간다.
+echo
 echo "설정 병합: $settings"
 python3 "$script_dir/merge-settings.py" presets/user/settings.json "$settings" \
   --backup-dir "$claude_home/backups"
 
-# 3. 값을 채워야 하는 env 를 알린다.
+# 4. 값을 채워야 하는 env 를 알린다.
 #
 #    비어 있어도 서버가 뜨는 것과 뜨지 못하는 것을 구분해서 적는다. 둘을 같은
 #    말투로 경고하면 진짜 죽은 쪽이 묻힌다.
@@ -58,7 +94,7 @@ if [ -z "$(jq -r '.env.GITHUB_PERSONAL_ACCESS_TOKEN // ""' "$settings")" ]; then
   echo "  붙이지 않을 거라면 enabledPlugins 의 github 을 false 로 내린다."
 fi
 
-# 4. 게이트가 실제로 서는지 확인한다.
+# 5. 게이트가 실제로 서는지 확인한다.
 #
 #    Codex bootstrap 이 plugin list 로 끝나는 것과 같은 이유다. 설치했다는 것과
 #    동작한다는 것은 다르고, 이 훅은 동작하지 않아도 조용하다.

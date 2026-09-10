@@ -49,9 +49,13 @@ frontend, backend, infra 세 도메인에서 끌어와야 하는데, 도메인�
 bash presets/claude/bootstrap.sh
 ```
 
-[`claude/bootstrap.sh`](claude/bootstrap.sh)가 유저 스코프 병합과 훅 설치를 멱등하게 처리하고, 마지막에 게이트가 실제로 서는지 확인한다. `CLAUDE_CONFIG_DIR`을 존중하므로 임시 디렉터리를 가리켜 먼저 시험해 볼 수 있다.
+[`claude/bootstrap.sh`](claude/bootstrap.sh)가 훅 설치, 플러그인 캐시 설치, 유저 스코프 병합을 멱등하게 처리하고, 마지막에 게이트가 실제로 서는지 확인한다. `CLAUDE_CONFIG_DIR`을 존중하므로 임시 디렉터리를 가리켜 먼저 시험해 볼 수 있다.
 
-**손으로 하지 않는다.** 선언적인 것은 `extraKnownMarketplaces`와 `enabledPlugins`뿐이고, 훅 복사는 파일 시스템 작업이라 JSON 병합으로 대신할 수 없다. 그 한 단계가 빠진 채 설정만 병합되면 `settings.json`이 없는 스크립트를 가리키게 되고, 그때부터 **모든 Bash 호출이 그것을 실행하려 든다.** 부분 적용이 아무것도 안 한 것보다 나쁜 유일한 지점이라 순서를 스크립트에 고정했다. 훅 파일을 먼저 놓고 설정을 나중에 병합한다.
+**손으로 하지 않는다.** 병합으로 안 되는 단계가 둘이다.
+
+훅 복사가 하나다. 파일 시스템 작업이라 JSON 병합으로 대신할 수 없다. 그 한 단계가 빠진 채 설정만 병합되면 `settings.json`이 없는 스크립트를 가리키게 되고, 그때부터 **모든 Bash 호출이 그것을 실행하려 든다.** 부분 적용이 아무것도 안 한 것보다 나쁜 유일한 지점이라 순서를 스크립트에 고정했다. 훅 파일을 먼저 놓고 설정을 나중에 병합한다.
+
+프로젝트 스코프가 켜는 플러그인의 캐시 설치가 나머지 하나다. **병합이 곧 설치인 것은 유저 스코프에서만이다.** 유저 캐시에 없는 플러그인을 프로젝트 설정이 켜면 세션 시작 때 로드 에러로 떨어진다. 2026-09-10 에 이 레포가 `skill-authoring`으로 그 상태였다. 아래 [Codex 캐시 목록](#codex)에 이미 적어 둔 제약인데 Claude 쪽에만 같은 줄이 빠져 있었다. 캐시 설치는 병합보다 앞이다. `claude plugin install`이 설치한 플러그인을 유저 스코프에서 켜고 나가므로, 병합이 뒤에 와야 프리셋의 `false`가 남는다.
 
 이 자동화가 없어서 이미 한 번 당했다. 2026-09-09 에 게이트를 레포에 만들어 두고, 게이트가 설치되지 않은 머신에서 Opus 세션 42개를 띄워 사용량 한도를 태웠다.
 
@@ -116,6 +120,10 @@ bash presets/codex/bootstrap.sh
 `dashboard`·`infra`·`skill-authoring`은 스킬이 0개다. **비어 있어도 참조되면
 넣는다.** 스킬 0개짜리 플러그인은 컨텍스트를 늘리지 않으므로 비용이 없고, 첫
 스킬이 들어온 날 배선을 다시 하지 않아도 된다.
+
+**Claude 도 같다.** 원래 이 문단은 Codex 제약으로만 적혀 있었는데, Claude 도
+유저 캐시에 없는 플러그인을 프로젝트 스코프에서 켜지 못한다. 그래서
+[`claude/bootstrap.sh`](claude/bootstrap.sh)도 같은 다섯을 설치한다.
 
 `architecture`는 어느 프로젝트 설정도 참조하지 않아 빠져 있다. 비어서가 아니라
 쓰는 자리가 아직 없어서다. 첫 프리셋이 참조하면 그때 캐시 목록에 넣는다.
@@ -188,7 +196,7 @@ CLAUDE_FANOUT_ACK=42 python3 scripts/real-trigger-eval.py --eval-set eval.json -
 
 **MCP 전용 셋은 상시 0이다.** 툴 스키마가 컨텍스트에 상주하지 않고 쓸 때 불려온다. 그래서 툴 개수로 유저 스코프를 판단하지 않는다. 근거는 SETUP-GUIDE §3.
 
-**내 도메인 플러그인도 똑같이 센다.** 아직 비어 있는 `architecture@kyle-skills`는 첫 스킬이 들어온 뒤 추가한다. `skill-authoring@kyle-skills`는 스킬을 쓰는 자리가 이 레포뿐이라 여기 넣지 않고 `skills` 레포의 프로젝트 스코프로 뒀다.
+**내 도메인 플러그인도 똑같이 센다.** 아직 비어 있는 `architecture@kyle-skills`는 첫 스킬이 들어온 뒤 추가한다. `skill-authoring@kyle-skills`는 스킬을 쓰는 자리가 이 레포뿐이라 유저 스코프에서 켜지 않고 `skills` 레포의 프로젝트 스코프로 뒀다. 다만 **프리셋에는 `false`로 적는다.** 항목을 빼면 캐시에 깔리지 않고, 캐시에 없는 플러그인은 프로젝트 설정이 켜지 못한다.
 
 `env`의 키 두 개는 빈 값으로 두었다. `CONTEXT7_API_KEY`는 비워도 익명으로 연결되고 rate limit 만 낮다. `GITHUB_PERSONAL_ACCESS_TOKEN`은 `github`을 켤 때 채우는 자리다. 비운 채로 켜면 400 으로 죽는다. 이유는 SETUP-GUIDE §7.
 
@@ -206,7 +214,9 @@ CLAUDE_FANOUT_ACK=42 python3 scripts/real-trigger-eval.py --eval-set eval.json -
 
 **항목을 지우면 안 꺼진다.** 병합은 프리셋에 있는 키만 덮어쓰므로, 지운 항목은 이미 켜진 머신에서 그대로 살아 있다. 끄려면 `false`로 적어야 전파된다. 지우면 "관심 없음", `false`면 "꺼라"다.
 
-Codex 쪽 [`codex/bootstrap.sh`](codex/bootstrap.sh)가 도메인 플러그인을 캐시에 깔고 사용자 기본값을 `false`로 되돌리는 것과 같은 패턴이다. 유저 스코프에서 끄고 각 레포의 프로젝트 설정이 필요한 것만 켠다.
+`backend`·`dashboard`·`frontend`·`infra`·`skill-authoring` 다섯은 이유가 다르다. 프로젝트 설정이 켜는 것들이라 **캐시에는 있어야 하고 유저 기본값은 꺼져 있어야 한다.** 지워서는 그 둘을 동시에 만족시킬 수 없으니 `false`로 적는다.
+
+두 부트스트랩이 같은 패턴이다. [`claude/bootstrap.sh`](claude/bootstrap.sh)와 [`codex/bootstrap.sh`](codex/bootstrap.sh)가 도메인 플러그인을 캐시에 깔고 사용자 기본값을 `false`로 되돌린다. 유저 스코프에서 끄고 각 레포의 프로젝트 설정이 필요한 것만 켠다.
 
 ```bash
 # 적용. 병합이라 model·theme 같은 개인 설정은 남는다

@@ -90,6 +90,8 @@
 
 지금 스킬이 0개라 유저 스코프에 둬도 비용이 없지만, **비용이 0이라는 것은 기준이 아니다.** 자리가 하나면 그 자리에 둔다. 그래야 첫 스킬이 들어온 날 다시 판단하지 않아도 된다. 이 레포의 [`.claude/settings.json`](../.claude/settings.json)과 [`.codex/config.toml`](../.codex/config.toml)이 켠다.
 
+**유저 프리셋에서 항목을 빼는 것과 `false`로 적는 것은 다르다 (2026-09-10 정정).** 빼면 캐시에 깔리지 않고, 캐시에 없는 플러그인은 프로젝트 설정이 켜도 로드 에러로 떨어진다. `false`로 적어야 캐시에는 들어가되 유저 스코프에서는 꺼진 상태가 된다.
+
 유저 스코프를 통과하지 못하는 세 번째 이유인 **중복**은 스코프 문제가 아니라 설치 여부 문제다. §4의 표에서 다룬다.
 
 ### vercel이 대표 사례인 이유
@@ -113,9 +115,9 @@
 "vercel@claude-plugins-official": false
 ```
 
-병합은 프리셋에 있는 키만 덮어쓰므로, 지운 항목은 이미 켜진 머신에서 그대로 살아 있다. 지우면 "관심 없음", `false`면 "꺼라"다. 프로젝트 스코프가 유저 스코프를 덮으므로 해당 레포에서는 정상적으로 켜진다.
+병합은 프리셋에 있는 키만 덮어쓰므로, 지운 항목은 이미 켜진 머신에서 그대로 살아 있다. 지우면 "관심 없음", `false`면 "꺼라"다. 프로젝트 스코프가 유저 스코프를 덮으므로 해당 레포에서는 정상적으로 켜진다. **유저 캐시에 설치돼 있을 때만이다.**
 
-Codex도 같은 패턴이다. [`presets/codex/bootstrap.sh`](../presets/codex/bootstrap.sh)가 도메인 플러그인을 캐시에 깔고 사용자 기본값을 `false`로 되돌린 뒤, 각 레포의 `.codex/config.toml`이 필요한 것만 `true`로 덮는다.
+두 하네스가 같은 패턴이다. [`presets/claude/bootstrap.sh`](../presets/claude/bootstrap.sh)와 [`presets/codex/bootstrap.sh`](../presets/codex/bootstrap.sh)가 도메인 플러그인을 캐시에 깔고 사용자 기본값을 `false`로 되돌린 뒤, 각 레포의 `.claude/settings.json`·`.codex/config.toml`이 필요한 것만 `true`로 덮는다.
 
 Codex 원격 카탈로그의 `vercel`은 현재 `GLOBAL` 항목이라 이 방식이 적용되지 않는다. 프로젝트 격리가 필요하면 Vercel MCP를 그 레포의 `.codex/config.toml`에 직접 구성하고, 배포 CLI와 SDK는 프로젝트 의존성으로 둔다.
 

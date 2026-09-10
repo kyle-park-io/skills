@@ -22,7 +22,13 @@
     "telegram@claude-plugins-official": false,
     "vercel@claude-plugins-official": false,
     "frontend-design@claude-plugins-official": false,
-    "playwright@claude-plugins-official": false
+    "playwright@claude-plugins-official": false,
+
+    "backend@kyle-skills": false,
+    "dashboard@kyle-skills": false,
+    "frontend@kyle-skills": false,
+    "infra@kyle-skills": false,
+    "skill-authoring@kyle-skills": false
   },
   "env": {
     "CONTEXT7_API_KEY": "",
