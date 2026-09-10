@@ -1,0 +1,12 @@
+[
+  {"query": "첫 화면이 느린데 어디서 막히는지 측정해서 고쳐줘", "should_trigger": true},
+  {"query": "버튼을 누르면 한참 뒤에 반응해. 프로파일을 남기고 수정 전후를 비교해줘", "should_trigger": true},
+  {"query": "이번 배포 뒤 번들 크기가 커졌는지 원인 청크까지 찾아줘", "should_trigger": true},
+  {"query": "스크롤할 때 프레임이 끊기는 이유를 추측 말고 트레이스로 확인해줘", "should_trigger": true},
+  {"query": "LCP가 나빠졌는데 같은 조건에서 병목을 재현하고 개선해줘", "should_trigger": true},
+  {"query": "결제 모달을 키보드만으로 쓸 수 있는지 접근성 검증해줘", "should_trigger": false},
+  {"query": "이 상태를 부모와 자식 중 어디서 소유해야 할지 정리해줘", "should_trigger": false},
+  {"query": "회원가입 흐름이 실제로 완료되는지 E2E 테스트를 추가해줘", "should_trigger": false},
+  {"query": "데이터베이스 쿼리가 느린 원인을 실행 계획으로 찾아줘", "should_trigger": false},
+  {"query": "히어로 섹션의 색상과 타이포그래피를 더 세련되게 바꿔줘", "should_trigger": false}
+]

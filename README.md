@@ -22,19 +22,23 @@ codex plugin marketplace add kyle-park-io/skills
 
 노트북을 새로 샀다면 이 명령 대신 [`presets/README.md` 새 머신 셋업](presets#새-머신-셋업)을 따른다. Claude Code는 유저 스코프 설정을 병합하고, Codex는 저장소의 부트스트랩 스크립트로 마켓플레이스와 공통 플러그인을 복구한다.
 
-Codex는 이 레포의 `.agents/plugins/marketplace.json`을 읽고, 각 도메인의 `.codex-plugin/plugin.json`을 호환 매니페스트로 사용한다. 플러그인을 쓰지 않고 스킬만 가져가려면 사용자 스코프는 `~/.agents/skills/`, 프로젝트 스코프는 `<repo>/.agents/skills/`에 필요한 스킬 폴더만 둔다.
+Codex는 이 레포의 `.agents/plugins/marketplace.json`을 읽고, 각 도메인의
+`.codex-plugin/plugin.json`을 호환 매니페스트로 사용한다. 로컬 마켓플레이스
+플러그인은 사용자 설정에 캐시해 두고 기본 비활성화한 뒤, 신뢰한 레포의
+`.codex/config.toml`에서 필요한 도메인만 활성화할 수 있다. 플러그인을 쓰지 않는
+독립 스킬은 사용자 스코프 `~/.agents/skills/`, 프로젝트 스코프
+`<repo>/.agents/skills/`에 둔다.
 
 ### 어디서나 쓸 도메인은 유저 스코프로
 
-`architecture`와 `process`는 스택을 안 가리므로 전역으로 켠다.
+`process`는 스택을 안 가리므로 전역으로 켠다. `architecture`도 같은 성격이지만
+현재 스킬이 비어 있어 첫 스킬이 들어온 뒤 전역 목록에 추가한다.
 
 ```bash
 # Claude Code
-claude plugin install architecture@kyle-skills
 claude plugin install process@kyle-skills
 
 # Codex
-codex plugin add architecture@kyle-skills
 codex plugin add process@kyle-skills
 ```
 
@@ -49,15 +53,16 @@ claude plugin install backend@kyle-skills    # scope: project
 
 `<repo>/.claude/settings.json`에 기록되므로 **커밋한다.** 그 레포를 여는 사람은 누구나 같은 도메인이 켜진 상태로 시작한다.
 
-Codex CLI의 플러그인 설치 상태는 사용자 설정에 기록된다. 특정 레포에만 둘 때는 이 레포를 로컬에 받은 뒤, 채워진 스킬 폴더 중 필요한 것만 대상 레포의 `.agents/skills/` 아래에 링크한다.
+Codex는 같은 프리셋의 `.codex/config.toml`을 복사한다. 최초 한 번 부트스트랩을
+실행하면 프로젝트용 도메인은 로컬 캐시에 설치되지만 사용자 기본값은 비활성화된다.
+복사한 프로젝트 설정이 해당 레포에서만 다시 활성화한다.
 
 ```bash
-mkdir -p <새 레포>/.agents/skills
-find <이 레포의 절대 경로>/backend/skills -mindepth 1 -maxdepth 1 -type d \
-  -exec ln -s {} <새 레포>/.agents/skills/ \;
+bash presets/codex/bootstrap.sh
+cp -r presets/project/backend-postgres/.codex <새 레포>/
 ```
 
-Claude Code에서는 프리셋을 통째로 복사해도 된다. 스택별로 공식 플러그인까지 묶어뒀다.
+Claude Code 프리셋에는 스택별 공식 플러그인까지 묶여 있다.
 
 ```bash
 cp -r presets/project/backend-postgres/.claude <새 레포>/
@@ -73,9 +78,13 @@ claude plugin marketplace update kyle-skills
 codex plugin marketplace upgrade kyle-skills
 ```
 
-### 왜 전부 링크하지 않는가
+### 왜 전부 켜지 않는가
 
-도메인 전체를 `~/.claude/skills/`나 `~/.agents/skills/`에 한꺼번에 링크하면 **7개 도메인의 모든 스킬이 항상 상주한다.** 그건 아래 컨텍스트 예산 원칙과 충돌한다. 사용자 스코프에는 어디서나 쓰는 스킬만 설치하고, 스택 전용 스킬은 프로젝트 설정이나 `<repo>/.agents/skills/`로 제한한다.
+도메인 전체를 사용자 스코프에서 켜거나 `~/.claude/skills/`,
+`~/.agents/skills/`에 한꺼번에 링크하면 **7개 도메인의 모든 스킬이 항상
+상주한다.** 그건 아래 컨텍스트 예산 원칙과 충돌한다. 사용자 스코프에는 어디서나
+쓰는 스킬만 활성화하고, 스택 전용 스킬은 프로젝트 설정이나
+`<repo>/.agents/skills/`로 제한한다.
 
 ---
 
@@ -106,7 +115,11 @@ skills/
 
 각 도메인 폴더의 `README.md`는 **카탈로그**다. 그 도메인에서 에이전트가 실패하는 지점, 쓸 만한 공식 플러그인과 OSS 스킬, 그리고 여기 직접 넣을 스킬 후보를 적어둔다.
 
-도메인 `skills/`는 아직 대부분 비어 있다. 지금 들어 있는 건 [`backend/schema-review`](backend/skills/schema-review)와 [`process/project-templates`](process/skills/project-templates) 둘이다. 매니페스트와 설치 경로는 이미 동작하므로, `SKILL.md`를 추가하고 커밋하면 그대로 배포된다.
+도메인 `skills/`는 아직 대부분 비어 있다. 지금 들어 있는 건
+[`backend/schema-review`](backend/skills/schema-review),
+[`process/project-templates`](process/skills/project-templates), 프론트엔드의
+`perf-triage`, `a11y-pass`, `component-boundary`다. 매니페스트와 설치 경로는 이미
+동작하므로, `SKILL.md`를 추가하고 커밋하면 그대로 배포된다.
 
 따라서 현재 `architecture`, `frontend`, `dashboard`, `infra`, `skill-authoring`은 카탈로그와 배포 자리만 있고 설치해도 스킬이 늘지 않는다. 각 도메인 README의 도구 목록은 추천 카탈로그이지 그 도메인 플러그인에 묶여 오는 의존성이 아니다.
 

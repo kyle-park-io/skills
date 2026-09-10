@@ -4,7 +4,13 @@
 
 측정 기준일 Claude Code 2026-09-09 · Codex CLI 2026-09-10 (0.153.4)
 
-§1에서 §3까지의 플러그인 수와 내장 스킬 수, `.claude/settings.json`, MCP 문제 해결은 Claude Code에서 측정한 운영 기준이다. Codex에도 컨텍스트 예산 원칙은 적용하지만 내장 및 설치된 스킬 목록은 현재 환경에서 별도로 센다. 자체 스킬은 같은 `SKILL.md`를 공유하고, 사용자 스코프는 `~/.agents/skills/`, 프로젝트 스코프는 `<repo>/.agents/skills/`를 쓴다. Codex 플러그인 설치와 갱신 명령은 루트 [`README.md`](../README.md#쓰는-법)에 정리했다.
+§1에서 §3까지의 플러그인 수와 내장 스킬 수, `.claude/settings.json`, MCP 문제
+해결은 Claude Code에서 측정한 운영 기준이다. Codex에도 컨텍스트 예산 원칙은
+적용하지만 내장 및 설치된 스킬 목록은 현재 환경에서 별도로 센다. 자체 플러그인은
+사용자 캐시에 두되 기본 비활성화하고, 신뢰한 레포의 `.codex/config.toml`에서
+프로젝트별로 활성화한다. 독립 스킬의 프로젝트 스코프는
+`<repo>/.agents/skills/`다. Codex 플러그인 설치와 갱신 명령은 루트
+[`README.md`](../README.md#쓰는-법)에 정리했다.
 
 ---
 
@@ -36,7 +42,7 @@
 
 ---
 
-## 2. 결정: vercel은 프로젝트 스코프다
+## 2. 결정: Claude의 vercel은 프로젝트 스코프다
 
 **`vercel`은 유저 스코프에서 내린다. Next.js/Vercel 레포에서만 켠다.**
 
@@ -63,13 +69,18 @@ cd <next.js 레포>
 claude plugin install vercel@claude-plugins-official   # scope: project
 ```
 
+Codex 원격 카탈로그의 `vercel`은 현재 `GLOBAL` 항목이다. 로컬 마켓플레이스
+플러그인처럼 프로젝트 `.codex/config.toml`에서 켜고 끄는 대상으로 가정하지 않는다.
+프로젝트 격리가 필요하면 Vercel MCP를 그 레포의 `.codex/config.toml`에 직접
+구성하고, 배포 CLI와 SDK는 프로젝트 의존성으로 둔다.
+
 ---
 
 ## 3. 결정: 유저 스코프는 스킬 30개까지
 
 어디서나 쓰는 것만 유저 스코프에 둔다. 언어·스택 중립이어야 한다.
 
-**세는 단위는 플러그인이 아니라 스킬이다.** 플러그인 개수는 실제 비용을 감춘다. 현재 유저 스코프 10개 플러그인이 스킬 26개를 싣는데, 분포가 고르지 않다.
+**세는 단위는 플러그인이 아니라 스킬이다.** 플러그인 개수는 실제 비용을 감춘다. 현재 Claude Code 유저 스코프 9개 플러그인이 스킬 26개를 싣는데, 분포가 고르지 않다.
 
 | 플러그인 | 스킬 | 성격 |
 |---|---:|---|
@@ -77,9 +88,10 @@ claude plugin install vercel@claude-plugins-official   # scope: project
 | `sentry` | 8 | 스킬 |
 | `claude-code-setup` · `claude-md-management` · `skill-creator` | 각 1 | 스킬 |
 | `context7` · `github` · `serena` | 0 | MCP 전용 |
-| `architecture@kyle-skills` · `process@kyle-skills` | 0 | 아직 비어 있음 |
+| `process@kyle-skills` | 1 | 프로젝트 설정 조각 재사용 |
+| `architecture@kyle-skills` | 0 | 아직 비어 있음 |
 
-`superpowers` 하나가 절반이고 `sentry`가 8개인데, MCP 전용 셋은 스킬을 하나도 싣지 않는다. "플러그인 10개"라는 숫자로는 이 차이가 안 보인다.
+`superpowers` 하나가 절반이고 `sentry`가 8개인데, MCP 전용 셋은 스킬을 하나도 싣지 않는다. "플러그인 9개"라는 숫자로는 이 차이가 안 보인다.
 
 **MCP 전용 플러그인은 별도 예산이다.** 이들이 싣는 건 스킬 설명문이 아니라 MCP 툴 정의다. 같은 서버를 `claude mcp add`로 직접 붙여도 툴 정의는 똑같이 들어가므로, 플러그인을 내린다고 컨텍스트가 줄지 않는다. 스킬 예산과 섞어 세지 않는다.
 
@@ -150,6 +162,26 @@ DB·클라우드·프레임워크·BI는 **전부 프로젝트 스코프**다. �
 **레퍼런스**
 
 - `claude-api`: 모델 ID·가격·파라미터·툴 유즈·캐싱
+
+### ① Codex 시스템 스킬과 프로젝트 지침
+
+Codex 시스템 스킬은 제품 버전과 실행 표면에 따라 달라지므로 Claude Code의
+16개처럼 고정 목록으로 운영하지 않는다. 0.153.4에서 확인한 공통 기반은
+`skill-creator`, `skill-installer`, `plugin-creator`, `openai-docs`다. 이미지
+생성이나 Work 플러그인 스킬처럼 표면별로 붙는 항목은 현재 세션의 스킬 목록을
+기준으로 센다.
+
+Codex는 스킬의 이름과 description을 먼저 보고 필요할 때 `SKILL.md`를 읽는다.
+로컬 스킬은 레포의 `.agents/skills/`와 사용자 `~/.agents/skills/`에서 찾는다.
+자세한 현재 기준은 [공식 스킬 문서](https://developers.openai.com/codex/build-skills)를
+따른다.
+
+작업 규약은 스킬로 복제하지 않고 `AGENTS.md`에 둔다. Codex는 세션 시작 시
+전역에서 현재 디렉터리까지 지침을 합치므로, 저장소 공통 규칙과 하위 디렉터리의
+예외를 분리할 수 있다. 서브에이전트는 실제 도구가 있고 사용자 요청이나 적용되는
+`AGENTS.md` 또는 스킬 지침이 위임을 요구할 때 사용한다. 기준은
+[공식 AGENTS.md 문서](https://developers.openai.com/codex/agent-configuration/agents-md)와
+[서브에이전트 문서](https://developers.openai.com/codex/agent-configuration/subagents)다.
 
 ### 겹쳐서 설치하지 않는 것
 
@@ -222,7 +254,7 @@ Codex의 서브에이전트는 현재 릴리스에서 기본 지원되지만, �
 
 - **[Claude 프로젝트 스코프]** `frontend-design` · `playwright` (§3)
 - **[Claude 코어]** `chrome-devtools-mcp` · `modern-web-guidance`
-- **[Codex 카탈로그]** `frontend-design-premium` · `figma` · `superdesign` · `vercel`
+- **[Codex 전역 카탈로그]** `frontend-design-premium` · `figma` · `superdesign` · `vercel`
 - **[Codex 별도 구성]** Playwright와 Chrome DevTools는 공식 카탈로그에 같은 이름이 없으므로 프로젝트 의존성이나 MCP로 직접 붙이고 검증
 
 ### [dashboard](../dashboard) · 부분
@@ -231,7 +263,7 @@ Claude Code에서는 차트를 **그리는** 능력을 내장 `dataviz`가 이�
 Codex에서는 현재 세션의 스킬 목록을 확인한다. 비는 건 공통적으로
 **데이터에 닿는 경로**다.
 
-- **[있음]** `dataviz` (내장)
+- **[Claude 있음]** `dataviz` (내장)
 - **[코어]** `duckdb-skills`: 셋업 비용 0, 가장 범용적
 - **[코어]** `grafana-mcp`: 대시보드를 직접 만들고 고침
 - **[선택]** `clickhouse` + `clickhouse-best-practices` · `posthog` / `amplitude`
@@ -341,4 +373,8 @@ Skipping connection (recent failure cached, retries automatically in 15 min)
 
 분류 축은 [`addyosmani/agent-skills`](https://github.com/addyosmani/agent-skills)의 디렉터리 구성을 기준선으로 삼았다. `api-and-interface-design`, `frontend-ui-engineering`, `observability-and-instrumentation`, `ci-cd-and-automation`, `documentation-and-adrs` 같은 이름들이다.
 
-superpowers 구성은 로컬 설치본 v6.3.0을 직접 열어 확인했다. context7 응답 코드는 엔드포인트에 직접 요청해 측정했다.
+superpowers 구성은 Claude Code와 Codex 카탈로그의 로컬 설치본 v6.3.0을 직접
+열어 확인했다. Codex 쪽은 CLI 0.153.4의 `plugin list`, 실제 설치 결과,
+`codex exec --json` 스킬 로드 이벤트를 함께 확인했다. 스킬 위치와 서브에이전트
+동작은 OpenAI의 공식 Codex 문서를 기준으로 했다. context7 응답 코드는
+엔드포인트에 직접 요청해 측정했다.

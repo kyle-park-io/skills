@@ -58,6 +58,10 @@ Code에서는 `fanout-cost-gate` 훅이 그 수를 계산해 막으므로,
 | `project-templates` | 2026-09-09 | Claude Code | `claude-opus-5` | 14 | 3 | 1.0 | 1.0 | 1.0 |
 | `schema-review` | 2026-09-09 | Claude Code | `claude-opus-5` | 20 | 3 | 1.0 | - | 1.0 |
 
+2026-09-10에 Codex CLI 0.153.4의 현재 설정 모델로 `project-templates` 양성
+쿼리 하나를 1회 실행해 새 감지 경로가 실제 `SKILL.md` 로드를 잡는 것까지
+확인했다. 평가 세트 전체를 돌린 결과가 아니므로 위 정확도 표에는 넣지 않는다.
+
 `project-templates` 는 **경계에 걸린 쿼리가 하나도 없었다.** 양성 7개가 전부 3/3, 음성 7개가 전부 0/3 이다. 1/3 이나 2/3 이 나오는 쿼리가 `description` 의 애매한 표현을 가리키는데, 그게 없었다.
 
 `schema-review` 의 숫자는 `a29fa11` 커밋 메시지에서 옮겨왔다. 셋이 남아 있지 않아 재현할 수 없다.

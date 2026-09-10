@@ -46,8 +46,9 @@ Claude의 `neon`처럼 이름이 다른 항목이 있으므로 설정을 그대�
 # Claude Code
 claude plugin install backend@kyle-skills
 
-# Codex
-codex plugin add backend@kyle-skills
+# Codex: 사용자 캐시는 한 번 준비하고 프로젝트 설정을 복사한다
+bash presets/codex/bootstrap.sh
+cp -r presets/project/backend-postgres/.codex <대상 레포>/
 ```
 
 스킬은 `backend/skills/` 아래에 둔다.

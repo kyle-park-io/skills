@@ -45,8 +45,9 @@ IaC 쪽은 반대 문제다. state·잠금·drift 같은 개념이 코드에 안
 # Claude Code
 claude plugin install infra@kyle-skills
 
-# Codex
-codex plugin add infra@kyle-skills
+# Codex: 사용자 캐시는 한 번 준비하고 프로젝트 설정을 복사한다
+bash presets/codex/bootstrap.sh
+cp -r presets/project/infra-terraform/.codex <대상 레포>/
 ```
 
 스킬은 `infra/skills/` 아래에 둔다.

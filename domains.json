@@ -43,7 +43,7 @@
       "displayName": "Frontend",
       "description": "UI 구현, 성능 진단, 브라우저 검증",
       "shortDescription": "UI work, measured performance triage, and browser verification",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "claudeCategory": "development",
       "codexCategory": "Developer Tools",
       "capabilities": ["Interactive", "Read", "Write"],

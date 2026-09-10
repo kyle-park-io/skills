@@ -1,0 +1,12 @@
+[
+  {"query": "이 페이지 머지 전에 접근성 패스 한번 돌려줘", "should_trigger": true},
+  {"query": "모달 포커스가 이상하고 키보드로 닫히지 않는데 검증해서 고쳐줘", "should_trigger": true},
+  {"query": "폼 오류 메시지가 스크린리더에도 제대로 전달되는지 봐줘", "should_trigger": true},
+  {"query": "로딩과 빈 상태까지 포함해서 접근 가능한 이름과 시맨틱을 점검해줘", "should_trigger": true},
+  {"query": "확대하면 레이아웃이 깨지고 포커스 표시도 안 보여. 접근성 문제를 확인해줘", "should_trigger": true},
+  {"query": "첫 화면 LCP가 느린 이유를 트레이스로 찾아줘", "should_trigger": false},
+  {"query": "이 컴포넌트를 어느 경계에서 나누는 게 좋을까", "should_trigger": false},
+  {"query": "브랜드 분위기에 맞게 랜딩 페이지 디자인을 새로 잡아줘", "should_trigger": false},
+  {"query": "회원가입 성공 경로의 Playwright E2E 테스트를 작성해줘", "should_trigger": false},
+  {"query": "이 제품이 WCAG 전체를 법적으로 준수한다고 인증서를 발급해줘", "should_trigger": false}
+]

@@ -31,7 +31,7 @@
     {
       "name": "frontend",
       "description": "UI 구현, 성능 진단, 브라우저 검증",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "source": "./frontend",
       "category": "development",
       "author": {

@@ -1,0 +1,6 @@
+[marketplaces.kyle-skills]
+source_type = "git"
+source = "https://github.com/kyle-park-io/skills"
+
+[plugins."backend@kyle-skills"]
+enabled = true

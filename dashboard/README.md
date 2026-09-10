@@ -47,8 +47,9 @@ Claude Code에서는 차트를 **그리는** 능력을 내장 `dataviz` 스킬�
 # Claude Code
 claude plugin install dashboard@kyle-skills
 
-# Codex
-codex plugin add dashboard@kyle-skills
+# Codex: 사용자 캐시는 한 번 준비하고 프로젝트 설정을 복사한다
+bash presets/codex/bootstrap.sh
+cp -r presets/project/data-analytics/.codex <대상 레포>/
 ```
 
 스킬은 `dashboard/skills/` 아래에 둔다.

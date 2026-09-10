@@ -68,7 +68,7 @@ Codex에서는 `--harness codex`를 쓴다. 이 경로는 `codex exec --json`에
 
 | 도구 | 가용성 | 역할 |
 |---|---|---|
-| `skill-creator` | 양쪽 기본 제공 | 생성·개선과 기본 검증 |
+| `skill-creator` | Claude 공식 플러그인 / Codex 시스템 | 생성·개선과 기본 검증 |
 | `superpowers:writing-skills` | 양쪽 Superpowers | 스킬 작성을 TDD로 |
 | `plugin-dev` | Claude Code | 훅·MCP 통합·마켓플레이스 배포 7개 스킬. 묶어서 배포할 단계면 |
 | `plugin-creator` | Codex 기본 제공 | 플러그인 골격과 로컬 마켓플레이스 구성 |
@@ -88,7 +88,7 @@ Codex에서는 `--harness codex`를 쓴다. 이 경로는 `codex exec --json`에
 
 ## 설치
 
-이 도메인의 `skills/`는 아직 비어 있다. 지금은 양쪽의 기본 `skill-creator`와
+이 도메인의 `skills/`는 아직 비어 있다. 지금은 양쪽에서 제공되는 `skill-creator`와
 하네스별 플러그인 도구를 쓰며, 자체 규칙이 생긴 뒤 이 플러그인을 설치한다.
 
 ```bash

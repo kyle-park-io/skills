@@ -49,11 +49,14 @@ python3 scripts/gen-manifests.py --check   # 최신 여부만 확인
 
 세 번째가 실패의 주된 원인이다. 먼저 `description` 에 **"이럴 때는 쓰지 않는다"** 를 명시적으로 쓴다. 겹치는 이웃 스킬을 이름으로 떠올리고 그쪽으로 가야 할 상황을 적는 것이 트리거 정확도를 만드는 주된 수단이다.
 
-그래도 안 뜨거나 엉뚱하게 뜨면 그때 측정한다. `scripts/real-trigger-eval.py` 를 쓴다. `skill-creator` 의 eval 은 스킬을 설치하지 않고 `.claude/commands/` 에 흉내 파일을 심어 재기 때문에 실물과 다른 숫자가 나온다 (`a29fa11`: 프록시 recall 11%, 실물 100%).
+그래도 안 뜨거나 엉뚱하게 뜨면 그때 측정한다. `scripts/real-trigger-eval.py` 를
+`--harness claude` 또는 `--harness codex`로 쓴다. `skill-creator` 의 Claude
+eval 은 스킬을 설치하지 않고 `.claude/commands/` 에 흉내 파일을 심어 재기
+때문에 실물과 다른 숫자가 나온다 (`a29fa11`: 프록시 recall 11%, 실물 100%).
 
 쿼리 셋은 [`evals/`](evals) 아래 스킬 이름으로 둔다. 형식과 지금까지의 측정 기록은 [`evals/README.md`](evals/README.md).
 
-**측정은 비싸다.** 쿼리 수 x 반복 횟수만큼 독립 세션이 뜬다. 14 쿼리를 3회씩 Opus 로 돌린 실측이 에이전트 작업 113분이었고, 그것이 하루치 사용량 한도를 태웠다. `fanout-cost-gate` 훅이 그 수를 계산해 막으므로 확인 없이는 실행되지 않는다 ([`presets/README.md`](presets/README.md#병렬-실행-비용-훅)). 모델 선택 기준은 스크립트의 docstring 에 있다.
+**측정은 비싸다.** 쿼리 수 x 반복 횟수만큼 독립 세션이 뜬다. 14 쿼리를 3회씩 Opus 로 돌린 실측이 에이전트 작업 113분이었고, 그것이 하루치 사용량 한도를 태웠다. Claude Code에서는 `fanout-cost-gate` 훅이 그 수를 계산해 막는다. Codex에는 그 Claude 훅이 적용되지 않으므로 실행자가 같은 계산을 먼저 확인한다 ([`presets/README.md`](presets/README.md#병렬-실행-비용-훅)). 모델 선택 기준은 스크립트의 docstring 에 있다.
 
 ## 문체
 

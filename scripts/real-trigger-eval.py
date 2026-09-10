@@ -64,10 +64,29 @@ Codex 는 사용자 플러그인 설치 상태나 프로젝트의 `.agents/skill
 import argparse
 import json
 import os
+import selectors
 import subprocess
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
+
+
+def stream_until(proc, timeout):
+    """출력이 없어도 timeout 시점에 끝나는 줄 스트림."""
+    deadline = time.monotonic() + timeout
+    with selectors.DefaultSelector() as selector:
+        selector.register(proc.stdout, selectors.EVENT_READ)
+        while True:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                return
+            if not selector.select(remaining):
+                return
+            raw = proc.stdout.readline()
+            if raw:
+                yield raw
+            elif proc.poll() is not None:
+                return
 
 
 def codex_event_triggered(event, skill):
@@ -101,11 +120,8 @@ def run_claude_once(query, cwd, skill, model, timeout, max_turns):
         stderr=subprocess.DEVNULL, cwd=cwd, env=env, text=True)
     triggered = False
     turns = 0
-    deadline = time.time() + timeout
     try:
-        for raw in proc.stdout:
-            if time.time() > deadline:
-                break
+        for raw in stream_until(proc, timeout):
             try:
                 event = json.loads(raw)
             except json.JSONDecodeError:
@@ -142,11 +158,8 @@ def run_codex_once(query, cwd, skill, model, timeout):
         command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL, cwd=cwd, text=True)
     triggered = False
-    deadline = time.time() + timeout
     try:
-        for raw in proc.stdout:
-            if time.time() > deadline:
-                break
+        for raw in stream_until(proc, timeout):
             try:
                 event = json.loads(raw)
             except json.JSONDecodeError:

@@ -1,22 +1,33 @@
 # presets
 
-Claude Code에 복사해서 쓰는 설정 원본. 도메인이 아니라 **스택** 단위로 잘랐다. 이 디렉터리의 `.claude` 파일은 Codex 설정 파일이 아니다.
+Claude Code와 Codex에 복사해서 쓰는 설정 원본. 도메인이 아니라 **스택** 단위로
+잘랐다. `.claude/settings.json`과 `.codex/config.toml`은 서로 다른 하네스의
+프로젝트 설정이다.
 
-Codex에서 사용자 전체에 쓸 도메인은 `codex plugin add <도메인>@kyle-skills`로 설치한다. 특정 레포에만 쓸 자체 스킬은 대상 레포의 `.agents/skills/`에 필요한 스킬 폴더만 둔다. Claude Code 공식 플러그인 이름은 Codex 마켓플레이스와 일대일로 대응하지 않으므로, 아래 프리셋의 외부 플러그인 목록을 Codex 설정으로 그대로 옮기지 않는다.
+Codex 로컬 마켓플레이스 플러그인은 사용자 캐시에 설치한 뒤 기본 비활성화하고,
+각 프리셋의 `.codex/config.toml`에서 그 스택에 필요한 도메인만 활성화한다.
+Claude Code 공식 플러그인 이름은 Codex 카탈로그와 일대일로 대응하지 않으므로,
+`.claude`의 외부 플러그인 목록을 `.codex`에 그대로 옮기지 않는다.
 
 ## 왜 도메인별이 아닌가
 
-레포 하나에는 `.claude/settings.json`이 하나다. Next.js + Postgres 앱이면 frontend·backend·infra 세 도메인에서 끌어와야 하는데, 도메인별 조각으로 흩어두면 쓸 때마다 손으로 합쳐야 한다. 설정이 실제로 적용되는 단위가 스택이므로 그 축으로 자른다.
+레포 하나에는 하네스별 프로젝트 설정이 하나씩 있다. Next.js + Postgres 앱이면
+frontend, backend, infra 세 도메인에서 끌어와야 하는데, 도메인별 조각으로
+흩어두면 쓸 때마다 손으로 합쳐야 한다. 설정이 실제로 적용되는 단위가 스택이므로
+그 축으로 자른다.
 
 도메인 폴더(`../backend` 등)는 그 자체가 **플러그인**이다. `.claude-plugin/plugin.json`과 `skills/`로 이뤄지고, 설치되면 하네스가 통째로 가져간다. 거기에 설정 JSON을 두면 플러그인 페이로드에 딸려 들어가 아무 의미 없는 파일이 된다.
 
-## Claude Code 세 스코프의 역할
+## 설정 스코프의 역할
 
-| 스코프 | 파일 | 담는 것 | 커밋 |
+| 하네스와 스코프 | 파일 | 담는 것 | 커밋 |
 |---|---|---|---|
-| 유저 | `~/.claude/settings.json` | 어디서나 쓰는 플러그인, `env` | 해당 없음 |
-| 프로젝트 | `<repo>/.claude/settings.json` | 그 스택 전용 플러그인 | **한다** |
-| 로컬 | `<repo>/.claude/settings.local.json` | `permissions.allow` | **안 한다** |
+| Claude 유저 | `~/.claude/settings.json` | 어디서나 쓰는 플러그인, `env` | 해당 없음 |
+| Claude 프로젝트 | `<repo>/.claude/settings.json` | 그 스택 전용 플러그인 | **한다** |
+| Claude 로컬 | `<repo>/.claude/settings.local.json` | `permissions.allow` | **안 한다** |
+| Codex 유저 | `~/.codex/config.toml` | 캐시된 플러그인의 기본 상태 | 해당 없음 |
+| Codex 프로젝트 | `<repo>/.codex/config.toml` | 자체 도메인 활성화, 프로젝트 MCP | **한다** |
+| Codex 독립 스킬 | `<repo>/.agents/skills/` | 플러그인 밖의 프로젝트 스킬 | **한다** |
 
 프로젝트 스코프는 공유 대상이다. 그 레포를 여는 사람이면 누구나 같은 플러그인을 켜야 하므로 커밋한다. 로컬 스코프는 내 머신에서 내가 승인한 명령 허용목록이라 공유 대상이 아니다. `.gitignore`에 넣는다.
 
@@ -80,26 +91,27 @@ bash presets/codex/bootstrap.sh
 ```
 
 이 스크립트는 `kyle-skills` 마켓플레이스와 공통 작업 절차인
-`superpowers@openai-curated-remote`, 실제 스킬이 들어 있는
-`process@kyle-skills`만 멱등하게 설치한다. 아직 비어 있는 `architecture`는
-스킬이 생긴 뒤 목록에 추가한다.
+`superpowers@openai-curated-remote`, `process@kyle-skills`를 멱등하게 설치하고
+이미 있으면 최신 마켓플레이스 버전으로 갱신한다.
+프로젝트용 `backend`, `dashboard`, `frontend`, `infra`도 로컬 캐시에 설치하지만
+사용자 기본값은 `false`로 되돌린다. 각 레포의 `.codex/config.toml`이 필요한
+도메인만 `true`로 덮어쓴다. 아직 비어 있는 `architecture`와
+`skill-authoring`은 첫 스킬이 들어온 뒤 캐시 목록에 추가한다.
 
-특정 레포에만 둘 자체 스킬은 플러그인으로 전역 설치하지 않고 그 레포의
-`.agents/skills/` 아래에 링크한다. Codex는 이 경로를 상위 디렉터리부터 레포
-루트까지 읽고 심볼릭 링크도 따라간다.
-
-```bash
-mkdir -p <대상 레포>/.agents/skills
-ln -s <이 레포>/backend/skills/schema-review \
-  <대상 레포>/.agents/skills/schema-review
-```
+플러그인으로 묶지 않은 프로젝트 전용 스킬은 `.agents/skills/`에 둔다. Codex는
+이 경로를 현재 디렉터리부터 레포 루트까지 읽고 심볼릭 링크도 따라간다.
 
 설치 뒤에는 새 대화를 열어 스킬 목록을 다시 적재한다. 확인 명령:
 
 ```bash
 codex plugin marketplace list
 codex plugin list
+codex -C <대상 레포> debug prompt-input | rg '<도메인>:'
 ```
+
+`plugin list`는 설치된 사용자 기본 상태를 보여 주므로 프로젝트 프리셋 안에서도
+`disabled`로 보일 수 있다. 실제 모델 입력에는 프로젝트 오버라이드가 적용된다.
+마지막 명령이나 새 대화 `/skills`에서 유효 상태를 확인한다.
 
 Claude의 `fanout-cost-gate` 훅은 Codex 설정에 적용되지 않는다. Codex로 트리거
 eval을 돌릴 때도 쿼리 수 x `--runs`를 먼저 계산하고 비용을 확인한다.
@@ -129,7 +141,7 @@ CLAUDE_FANOUT_ACK=42 python3 scripts/real-trigger-eval.py --eval-set eval.json -
 
 ## user/
 
-유저 스코프 원본. 플러그인 10개. 공식 8개와 내 도메인 플러그인 2개다.
+유저 스코프 원본. 플러그인 9개. 공식 8개와 내 도메인 플러그인 1개다.
 
 이 디렉터리의 JSON과 훅은 Claude Code 전용이다. Codex의 공통 설치 목록은
 [`codex/bootstrap.sh`](codex/bootstrap.sh)가 맡는다.
@@ -146,10 +158,9 @@ CLAUDE_FANOUT_ACK=42 python3 scripts/real-trigger-eval.py --eval-set eval.json -
 | `context7` | 최신 라이브러리 문서 조회 |
 | `github` | 이슈·PR·CI |
 | `sentry` | 에러·스택 트레이스 |
-| `architecture@kyle-skills` | 내 아키텍처 스킬 |
 | `process@kyle-skills` | 내 작업 절차 스킬 |
 
-**내 도메인 플러그인도 똑같이 센다.** 지금은 스킬 26개라 여유가 있지만, 도메인에 스킬을 채우면 금방 찬다. `skill-authoring@kyle-skills`는 스킬을 쓰는 자리가 이 레포뿐이라 여기 넣지 않고 `skills` 레포의 프로젝트 스코프로 뒀다.
+**내 도메인 플러그인도 똑같이 센다.** 지금은 스킬 26개라 여유가 있지만, 도메인에 스킬을 채우면 금방 찬다. 아직 비어 있는 `architecture@kyle-skills`는 첫 스킬이 들어온 뒤 추가한다. `skill-authoring@kyle-skills`는 스킬을 쓰는 자리가 이 레포뿐이라 여기 넣지 않고 `skills` 레포의 프로젝트 스코프로 뒀다.
 
 `env.CONTEXT7_API_KEY`는 빈 값으로 두었다. [context7.com/dashboard](https://context7.com/dashboard)에서 발급해 채운다. 비워두면 401이 난다. 이유는 SETUP-GUIDE §7.
 
@@ -164,20 +175,30 @@ $EDITOR ~/.claude/settings.json
 
 ## project/
 
-레포 루트에 `.claude/` 통째로 복사한다.
+레포 루트에 사용하는 하네스의 설정 디렉터리를 복사한다. 둘 다 쓰면 둘 다
+복사한다.
 
 ```bash
 cp -r presets/project/nextjs-vercel/.claude <대상 레포>/
+cp -r presets/project/nextjs-vercel/.codex <대상 레포>/
 ```
 
-| 프리셋 | 공식 플러그인 | 내 도메인 |
+| 프리셋 | Claude 공식 플러그인 | 자체 도메인, 양쪽 공통 |
 |---|---|---|
-| `nextjs-vercel` | vercel · frontend-design · playwright · chrome-devtools-mcp · modern-web-guidance · typescript-lsp | `frontend` · `infra` |
-| `backend-postgres` | prisma · postman · typescript-lsp | `backend` |
-| `data-analytics` | duckdb-skills · grafana-mcp · pyright-lsp | `dashboard` |
-| `infra-terraform` | terraform · aws-core · semgrep | `infra` |
+| `nextjs-vercel` | vercel, frontend-design, playwright, chrome-devtools-mcp, modern-web-guidance, typescript-lsp | `frontend`, `infra` |
+| `backend-postgres` | prisma, postman, typescript-lsp | `backend` |
+| `data-analytics` | duckdb-skills, grafana-mcp, pyright-lsp | `dashboard` |
+| `infra-terraform` | terraform, aws-core, semgrep | `infra` |
 
-오른쪽 열은 함께 켜지는 내 도메인 플러그인이다. 프리셋 JSON에 `@kyle-skills`로 들어가 있으므로 [유저 스코프 설정을 먼저 넣어야](#새-머신-셋업) 해석된다.
+오른쪽 열은 `.claude`와 `.codex`에서 함께 켜지는 자체 도메인 플러그인이다.
+Codex 프로젝트 설정은 신뢰한 레포에서만 읽힌다. 사용자 캐시를 먼저 준비해야
+하므로 [새 머신 셋업](#새-머신-셋업)의 부트스트랩을 한 번 실행한다.
+
+Codex 원격 카탈로그의 `frontend-design-premium`, `figma`, `superdesign`,
+`vercel`은 현재 `GLOBAL` 항목이라 이 프로젝트 프리셋에 넣지 않는다. 실제로 여러
+레포에서 쓸 때만 전역 설치한다. 프로젝트 격리가 필요하면 디자인 지침은
+`.agents/skills/`, Figma와 Vercel 같은 외부 연결은 `.codex/config.toml`의 MCP,
+Playwright는 프로젝트 의존성으로 둔다.
 
 ### 바꿔 끼우는 자리
 
@@ -187,7 +208,8 @@ cp -r presets/project/nextjs-vercel/.claude <대상 레포>/
 - **클라우드**: `aws-core` 자리에 `azure` / `cloudflare` / `railway` / `render`. **하나만** 켠다
 - **언어 서버**: `typescript-lsp` 자리에 `pyright-lsp` / `gopls-lsp` / `rust-analyzer-lsp`
 
-여러 프리셋을 합칠 때는 `enabledPlugins` 객체를 병합한다. 겹치는 키는 그냥 하나로 둔다.
+여러 프리셋을 합칠 때 Claude는 `enabledPlugins` 객체를 병합한다. Codex는
+`marketplaces.kyle-skills`를 하나만 남기고 `plugins` 테이블을 합친다.
 
 ---
 

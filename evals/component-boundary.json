@@ -1,0 +1,12 @@
+[
+  {"query": "이 거대한 React 컴포넌트를 어디서 나눌지 상태 소유권부터 봐줘", "should_trigger": true},
+  {"query": "필터 상태를 페이지와 테이블 중 어디에 두는 게 맞는지 결정해줘", "should_trigger": true},
+  {"query": "prop drilling을 없애려고 전역 상태로 올리려는데 경계가 맞는지 검토해줘", "should_trigger": true},
+  {"query": "서버 컴포넌트와 클라이언트 컴포넌트 경계를 다시 잡아줘", "should_trigger": true},
+  {"query": "데이터 로딩과 오류 처리를 어느 컴포넌트가 소유해야 할지 정리해줘", "should_trigger": true},
+  {"query": "이 카드의 여백과 색상만 디자인 시안대로 바꿔줘", "should_trigger": false},
+  {"query": "스크롤 버벅임을 측정해서 성능 병목을 찾아줘", "should_trigger": false},
+  {"query": "접근성 자동 검사와 키보드 테스트를 돌려줘", "should_trigger": false},
+  {"query": "이미 정한 경계대로 UserPanel 파일을 두 파일로 옮겨줘", "should_trigger": false},
+  {"query": "로그인부터 로그아웃까지 브라우저 E2E 테스트를 만들어줘", "should_trigger": false}
+]
