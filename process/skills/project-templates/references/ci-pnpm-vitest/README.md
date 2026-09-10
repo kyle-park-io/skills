@@ -2,6 +2,10 @@
 
 **복사형.** `files/` 를 레포 루트에 복사하면 일단 돈다.
 
+> **마지막 검증**: 2026-09-09 에 `mantle-kr-herald` 에서 뽑음. **새 레포에 적용해본 적 없다.**
+>
+> 썩는 값: `actions/checkout@v4`, `actions/setup-node@v4`, `pnpm/action-setup@v4`, `node-version: 24`. 액션 메이저 버전과 Node 버전은 시간이 지나면 틀려지고, **틀려도 조용히 경고만 뜬다.** 쓰기 전에 현재 버전을 확인한다.
+
 pnpm + TypeScript + Vitest 레포의 GitHub Actions 워크플로. 스텝 두 개가 조각의 내용이고, 나머지는 그 둘을 돌리기 위한 골조다.
 
 ## 출처

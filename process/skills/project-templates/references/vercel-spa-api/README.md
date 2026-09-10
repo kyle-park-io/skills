@@ -2,6 +2,10 @@
 
 **복사형.** 단, `vercel.json` 의 값은 대부분 바꿔야 한다.
 
+> **마지막 검증**: 2026-09-09 에 `mantle-kr-herald` 에서 뽑음. **새 레포에 적용해본 적 없다.**
+>
+> 썩는 값: `regions: sin1` (마켓플레이스가 주는 리전 목록은 플랫폼이 바꾼다), 그리고 **Vercel zero-config 빌더의 라우팅 동작 자체.** 이 조각의 rewrite 는 `[...path]` 를 단일 세그먼트로 읽는 그 동작 때문에 있다. 플랫폼이 고치면 rewrite 가 불필요해지거나 반대로 해로워진다. `npx vercel build` 로 `.vercel/output/config.json` 을 뽑아 지금도 그런지 확인한다.
+
 정적 SPA 와 서버리스 함수를 한 Vercel 배포에 올리는 레포용. `.vercelignore` 가 이 조각의 본체이고 `vercel.json` 은 라우팅 함정 하나 때문에 딸려 있다.
 
 ## 출처
