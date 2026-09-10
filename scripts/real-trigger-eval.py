@@ -24,6 +24,36 @@
 eval.json 은 `[{"query": "...", "should_trigger": true}, ...]` 형식이다.
 발동해야 하는 쿼리와 아닌 쿼리를 비슷한 수로 섞고, 부정 쿼리는 키워드가
 겹치는 근접 사례로 채운다. 명백히 무관한 쿼리는 아무것도 검증하지 않는다.
+
+비용
+----
+
+쿼리 수 x --runs 만큼 독립 세션이 뜬다. 각 세션이 자기 시스템 프롬프트를 새로
+싣고 대상 레포를 탐색한다. 14 쿼리를 3회씩 Opus 5 로 돌린 실측이 에이전트
+작업 113분이었다. **돌리기 전에 그 곱셈을 하고, 남이 쓰는 쿼터면 먼저 묻는다.**
+
+모델
+----
+
+평소 쓰는 모델로 재야 그 숫자가 내 세션의 숫자다. 스킬 선택은 모델이 하는
+판단이라 모델이 바뀌면 답도 바뀐다.
+
+다만 description 을 고쳐가며 반복하는 동안에는 싼 모델로 훑는다. "아예 안
+뜬다" 나 "아무 데나 뜬다" 같은 큰 실패는 거기서 다 잡힌다. 확정 직전에 한 번만
+실제로 쓰는 모델로 잰다.
+
+언제 돌리나
+-----------
+
+**새 스킬을 만들 때마다 돌리지 않는다.** 이건 진단이지 관문이 아니다.
+
+돌릴 때는 이렇다. 써야 할 스킬이 안 떠서 손으로 부른 적이 있을 때. 새 스킬의
+트리거 상황이 기존 스킬과 겹쳐 보일 때. 도메인을 남에게 열 때.
+
+지금까지 두 번 (schema-review, project-templates) 다 결과가 만점이었고,
+**측정은 이미 맞던 description 을 확인해준 것뿐이었다.** 트리거 정확도를 만든
+것은 측정이 아니라 description 에 "이럴 때 쓰지 않는다" 를 명시적으로 쓴
+쪽이다. 그게 먼저고, 이 스크립트는 그게 안 통했을 때 부른다.
 """
 import argparse
 import json
@@ -34,14 +64,27 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 
 
-def run_once(query, cwd, skill, model, timeout):
-    """쿼리 하나를 돌리고 대상 스킬이 열렸는지 반환한다."""
+def run_once(query, cwd, skill, model, timeout, max_turns):
+    """쿼리 하나를 돌리고 대상 스킬이 열렸는지 반환한다.
+
+    런은 두 가지 조건에서 즉시 끝난다. 둘 다 측정에 아무것도 더하지 않는 구간을
+    잘라내는 것이고, 이 함수가 도는 비용의 대부분이 거기 있었다.
+
+    스킬이 열리면 그 자리에서 끊는다. 발동 여부는 그 시점에 확정이고, 이후는
+    에이전트가 그 스킬의 작업을 실제로 수행하는 시간이다. 이 조건이 없던 동안
+    양성 쿼리 한 런이 음성 쿼리의 두 배를 썼다 (측정: 216초 대 106초).
+
+    스킬 없이 max_turns 턴을 넘기면 끊는다. 스킬 선택은 첫 턴의 판단이라 그때
+    안 열린 것은 뒤에도 안 열린다. 음성 쿼리는 발동이 없어 앞의 조건에 안 걸리므로
+    이쪽이 상한이 된다.
+    """
     env = {k: v for k, v in os.environ.items() if k != "CLAUDECODE"}
     proc = subprocess.Popen(
         ["claude", "-p", query, "--model", model,
          "--output-format", "stream-json", "--verbose"],
         stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, cwd=cwd, env=env)
     triggered = False
+    turns = 0
     deadline = time.time() + timeout
     try:
         for raw in proc.stdout:
@@ -52,10 +95,14 @@ def run_once(query, cwd, skill, model, timeout):
             except json.JSONDecodeError:
                 continue
             if event.get("type") == "assistant":
+                turns += 1
                 for block in event.get("message", {}).get("content", []):
                     if block.get("type") == "tool_use" and block.get("name") == "Skill":
                         if skill in str(block.get("input", {})):
                             triggered = True
+                            break
+                if triggered or turns >= max_turns:
+                    break
             if event.get("type") == "result":
                 break
     finally:
@@ -69,7 +116,7 @@ def evaluate(item, args):
     """쿼리 하나를 여러 번 돌려 과반으로 발동 여부를 정한다."""
     started = time.time()
     hits = sum(run_once(item["query"], args.project, args.skill,
-                        args.model, args.timeout)
+                        args.model, args.timeout, args.max_turns)
                for _ in range(args.runs))
     fired = hits > args.runs // 2
     result = {
@@ -110,6 +157,9 @@ def main():
     parser.add_argument("--workers", type=int, default=6)
     parser.add_argument("--timeout", type=int, default=300,
                         help="런 하나의 상한 초. 짧게 잡으면 발동을 놓친다")
+    parser.add_argument("--max-turns", type=int, default=6,
+                        help="스킬 없이 이 턴을 넘기면 미발동으로 끊는다. "
+                             "스킬 선택은 첫 턴의 판단이라 여유를 크게 줄 이유가 없다")
     args = parser.parse_args()
 
     settings = os.path.join(args.project, ".claude", "settings.json")
