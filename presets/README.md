@@ -46,17 +46,50 @@ Codex에서 사용자 전체에 쓸 도메인은 `codex plugin add <도메인>@k
 claude plugin marketplace add anthropics/claude-plugins-official
 ```
 
-**2. `env`를 채운다.**
+**2. 훅 스크립트를 복사한다.**
+
+`settings.json`의 `hooks` 블록이 `~/.claude/hooks/fanout-cost-gate.sh`를 부른다. **파일이 없으면 모든 Bash 호출이 없는 스크립트를 실행하려 든다.**
+
+```bash
+mkdir -p ~/.claude/hooks
+cp presets/user/hooks/fanout-cost-gate.sh ~/.claude/hooks/
+chmod +x ~/.claude/hooks/fanout-cost-gate.sh
+```
+
+무엇을 하는 훅인지는 아래 [병렬 실행 비용 훅](#병렬-실행-비용-훅).
+
+**3. `env`를 채운다.**
 
 `CONTEXT7_API_KEY`는 레포에 빈 값으로 두었다. [context7.com/dashboard](https://context7.com/dashboard)에서 발급해 넣는다. 비워두면 401이 난다.
 
 **토큰이 든 `settings.json`을 머신 간에 그대로 복사하지 않는다.** 레포의 프리셋을 병합하고 값은 새로 발급하는 쪽이 맞다.
 
-**3. 작업 레포를 클론한다.**
+**4. 작업 레포를 클론한다.**
 
 프로젝트 스코프는 여기서 자동으로 붙는다. 커밋된 `<repo>/.claude/settings.json`이 `backend@kyle-skills` 같은 항목을 이미 들고 있고, 1번에서 마켓플레이스를 알려줬으므로 해석된다.
 
 ---
+
+## 병렬 실행 비용 훅
+
+`user/hooks/fanout-cost-gate.sh`. `PreToolUse`로 모든 Bash 호출을 스쳐 지나가되 **독립 Claude 세션을 3개 이상 띄우는 명령만** 가로챈다.
+
+세션 수를 명령에서 직접 계산한다. `--eval-set`의 쿼리 수 곱하기 `--runs`, 또는 명령에 박힌 직접 호출 횟수 중 큰 쪽이다. 그 수를 화면에 띄우고 실행을 막는다. 열려면 `CLAUDE_FANOUT_ACK=<세션 수>`를 명령 앞에 붙인다. **숫자가 계산값과 일치해야 하므로 실행하려면 그 수를 먼저 알아야 한다.**
+
+```bash
+# 막힌다
+python3 scripts/real-trigger-eval.py --eval-set eval.json --runs 3 ...
+#   -> 독립 Claude 세션 42개를 띄웁니다 (쿼리 14 x 반복 3)
+
+# 통과한다
+CLAUDE_FANOUT_ACK=42 python3 scripts/real-trigger-eval.py --eval-set eval.json --runs 3 ...
+```
+
+**`ask`가 아니라 `deny`인 이유.** `permissionDecision: "ask"`는 권한 프롬프트를 거치는데 `bypassPermissions` 모드에서는 그 프롬프트가 건너뛰어질 수 있다. 이 규칙은 모드와 무관하게 서야 한다.
+
+**오탐은 남겨뒀다.** 명령을 문서에 적거나 테스트를 짜는 것과 명령을 실행하는 것을 문자열만 보고 완전히 구분할 수는 없다. eval 쪽은 `--eval-set` 파일이 실제로 있을 때만 세어 대부분 걸러지지만, 직접 호출 문자열이 세 번 이상 든 글을 쓰면 걸린다. **fail-closed가 맞다.** 오탐은 ack 한 번이고, 놓치면 하루치 쿼터다.
+
+**왜 있는가.** 2026-09-09에 트리거 eval을 14쿼리 x 3회로 백그라운드 실행했고, 그것이 Opus 세션 42개와 에이전트 작업 113분이 되어 사용량 한도를 태웠다. 대화 컨텍스트는 싸다 (그 세션 전체가 178k / 1M). 비싼 것은 **세션을 새로 여는 일**이고 각 세션이 자기 시스템 프롬프트를 새로 싣는다. 그리고 그 수는 명령을 읽으면 실행 전에 계산된다. 계산할 수 있는 것을 사고가 난 뒤에 알 이유가 없다.
 
 ## user/
 
