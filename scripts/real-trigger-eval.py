@@ -12,7 +12,7 @@
 사용법:
 
     python3 scripts/real-trigger-eval.py \\
-        --eval-set eval.json \\
+        --eval-set evals/<스킬>.json \\
         --project <플러그인을 켜둔 레포 경로> \\
         --skill schema-review \\
         --out result.json
@@ -21,9 +21,9 @@
 켜져 있고, 스킬이 다룰 코드가 실제로 들어 있는 레포여야 한다. 빈
 디렉터리에서 재면 발동률이 실제보다 낮게 나온다.
 
-eval.json 은 `[{"query": "...", "should_trigger": true}, ...]` 형식이다.
-발동해야 하는 쿼리와 아닌 쿼리를 비슷한 수로 섞고, 부정 쿼리는 키워드가
-겹치는 근접 사례로 채운다. 명백히 무관한 쿼리는 아무것도 검증하지 않는다.
+쿼리 셋은 `evals/<스킬>.json` 에 둔다. 스킬 폴더 안에 두면 플러그인
+페이로드로 딸려 나가 설치자에게 쓸모없는 파일이 된다. 형식과 음성 쿼리를
+고르는 법, 그리고 지금까지의 측정 기록은 `evals/README.md` 에 있다.
 
 비용
 ----

@@ -1,0 +1,16 @@
+[
+  {"query": "이 레포 CI 설정 중에 다음 레포로 가져갈 만한 게 뭐가 있는지 봐줘", "should_trigger": true},
+  {"query": "배포 설정에서 재사용할 수 있는 걸 뽑아서 조각으로 정리해줘", "should_trigger": true},
+  {"query": "새 레포를 세우는데 CI 워크플로에 뭘 넣을지 골라줘", "should_trigger": true},
+  {"query": ".vercelignore 랑 vercel.json 을 다음 프로젝트에서도 쓰게 템플릿으로 남기고 싶어", "should_trigger": true},
+  {"query": "이 systemd 타이머 설정을 다른 프로젝트에도 쓰려면 뭘 챙겨야 해?", "should_trigger": true},
+  {"query": "이 레포에서 사고 겪고 굳어진 설정들을 근거랑 같이 재사용 가능하게 만들어줘", "should_trigger": true},
+  {"query": "지난 레포에서 당한 CI 문제를 이번 레포에서도 막고 싶은데 뭘 가져오면 되지", "should_trigger": true},
+  {"query": "이 레포에 어떤 훅이랑 서브에이전트를 붙이면 좋을지 추천해줘", "should_trigger": false},
+  {"query": "CLAUDE.md 를 이 레포에 맞게 정리해줘", "should_trigger": false},
+  {"query": "CI 가 지금 깨져 있는데 왜 그런지 찾아줘", "should_trigger": false},
+  {"query": "이 워크플로에 pnpm store 캐시 스텝 하나 추가해줘", "should_trigger": false},
+  {"query": "새 알림 기능을 만들고 싶은데 같이 설계 좀 하자", "should_trigger": false},
+  {"query": "MCP 서버를 이 프로젝트에 어떻게 붙이는지 알려줘", "should_trigger": false},
+  {"query": "이 레포 구조를 파악해서 의존성 다이어그램을 그려줘", "should_trigger": false}
+]

@@ -99,7 +99,8 @@ skills/
 ├── process/               작업 절차 (superpowers 보강)
 ├── skill-authoring/       스킬 자체를 만들고 검증하는 법
 ├── _template/             새 스킬 시작점
-├── presets/               Claude Code 설정 원본 (스택별)
+├── presets/               Claude Code 설정 원본 (스택별) + 훅
+├── evals/                 트리거 쿼리 셋 (스킬별)
 └── docs/                  운영 기준
 ```
 

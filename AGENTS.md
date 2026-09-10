@@ -51,7 +51,9 @@ python3 scripts/gen-manifests.py --check   # 최신 여부만 확인
 
 그래도 안 뜨거나 엉뚱하게 뜨면 그때 측정한다. `scripts/real-trigger-eval.py` 를 쓴다. `skill-creator` 의 eval 은 스킬을 설치하지 않고 `.claude/commands/` 에 흉내 파일을 심어 재기 때문에 실물과 다른 숫자가 나온다 (`a29fa11`: 프록시 recall 11%, 실물 100%).
 
-**측정은 비싸다.** 쿼리 수 x 반복 횟수만큼 독립 세션이 뜬다. 14 쿼리를 3회씩 Opus 로 돌린 실측이 에이전트 작업 113분이었다. 스크립트의 docstring 에 비용과 모델 선택 기준이 있다.
+쿼리 셋은 [`evals/`](evals) 아래 스킬 이름으로 둔다. 형식과 지금까지의 측정 기록은 [`evals/README.md`](evals/README.md).
+
+**측정은 비싸다.** 쿼리 수 x 반복 횟수만큼 독립 세션이 뜬다. 14 쿼리를 3회씩 Opus 로 돌린 실측이 에이전트 작업 113분이었고, 그것이 하루치 사용량 한도를 태웠다. `fanout-cost-gate` 훅이 그 수를 계산해 막으므로 확인 없이는 실행되지 않는다 ([`presets/README.md`](presets/README.md#병렬-실행-비용-훅)). 모델 선택 기준은 스크립트의 docstring 에 있다.
 
 ## 문체
 
