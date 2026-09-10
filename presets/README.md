@@ -65,7 +65,10 @@ bash presets/claude/bootstrap.sh
 - `env`는 **빈 값일 때만** 자리를 만든다. 프리셋의 `CONTEXT7_API_KEY`가 빈 문자열이라, 그대로 덮어쓰면 이미 발급해 넣은 키를 지운다.
 - `hooks`는 `command` 기준으로 합친다. 이미 붙여 둔 다른 훅은 건드리지 않는다.
 - [`user/hooks/fanout-cost-gate.sh`](user/hooks/fanout-cost-gate.sh)를 `~/.claude/hooks/`에 복사하고 실행 권한을 준다.
+- [`claude/serena-config.py`](claude/serena-config.py)로 `~/.serena/serena_config.yml`의 `gui_log_window`와 `web_dashboard_open_on_launch`를 `false`로 내린다. Serena 자신의 설정 파일이라 `settings.json` 병합이 닿지 않는데, 끄지 않으면 세션을 적재할 때마다 브라우저 탭이 열린다. 대시보드 자체는 살려 두므로 필요하면 `http://localhost:24282/dashboard/`로 직접 들어간다.
 - 훅에 가짜 페이로드를 먹여 세션 42개짜리 명령이 차단되는지, `CLAUDE_FANOUT_ACK=42`가 통과되는지, 무관한 명령이 통과되는지 셋 다 확인한다. 하나라도 어긋나면 0이 아닌 값으로 죽는다.
+
+**Serena 설정만 YAML 파서를 쓰지 않는다.** 그 파일은 주석이 본문보다 길고, 대시보드를 수동으로 여는 주소 같은 것이 전부 주석에 있다. 통째로 다시 쓰면 그게 사라지니 두 줄만 갈아 끼운다. 그리고 그 파일은 **Serena 가 처음 실행될 때 생긴다.** 새 머신에서는 부트스트랩이 먼저 도니 없는 것이 정상이고, 그때는 알리고 넘어간다. Serena 를 한 번 띄운 뒤 부트스트랩을 다시 돌린다.
 
 마지막 항목이 있는 이유는 Codex 부트스트랩이 `plugin list`로 끝나는 것과 같다. 설치했다는 것과 동작한다는 것은 다르고, **이 훅은 동작하지 않아도 조용하다.**
 

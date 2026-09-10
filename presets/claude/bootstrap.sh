@@ -13,6 +13,8 @@
 #   없는 플러그인을 프로젝트 설정이 켜면 세션 시작 때 로드 에러로 떨어진다.
 #   `skills` 레포가 `skill-authoring` 으로 그 상태였다.
 #
+#   Serena 설정은 아예 다른 파일에 산다. 병합의 사정거리 밖이라 따로 만진다.
+#
 # 순서가 중요하다
 #   훅 파일을 먼저 복사하고 설정을 나중에 병합한다. 반대로 하면 settings.json 이
 #   없는 스크립트를 가리키는 구간이 생기고, 그 사이 모든 Bash 호출이 그것을
@@ -76,7 +78,15 @@ echo "설정 병합: $settings"
 python3 "$script_dir/merge-settings.py" presets/user/settings.json "$settings" \
   --backup-dir "$claude_home/backups"
 
-# 4. 값을 채워야 하는 env 를 알린다.
+# 4. Serena 가 여는 창을 끈다.
+#
+#    `~/.serena/serena_config.yml` 은 Claude 설정이 아니라 Serena 자신의 설정이라
+#    병합으로 닿지 않는다. 끄지 않으면 세션을 적재할 때마다 브라우저 탭이 열린다.
+echo
+echo "Serena 설정"
+python3 "$script_dir/serena-config.py" --backup-dir "$claude_home/backups"
+
+# 5. 값을 채워야 하는 env 를 알린다.
 #
 #    비어 있어도 서버가 뜨는 것과 뜨지 못하는 것을 구분해서 적는다. 둘을 같은
 #    말투로 경고하면 진짜 죽은 쪽이 묻힌다.
@@ -94,7 +104,7 @@ if [ -z "$(jq -r '.env.GITHUB_PERSONAL_ACCESS_TOKEN // ""' "$settings")" ]; then
   echo "  붙이지 않을 거라면 enabledPlugins 의 github 을 false 로 내린다."
 fi
 
-# 5. 게이트가 실제로 서는지 확인한다.
+# 6. 게이트가 실제로 서는지 확인한다.
 #
 #    Codex bootstrap 이 plugin list 로 끝나는 것과 같은 이유다. 설치했다는 것과
 #    동작한다는 것은 다르고, 이 훅은 동작하지 않아도 조용하다.
