@@ -2,7 +2,9 @@
 
 **복사형.** `files/` 를 레포 루트에 복사하면 일단 돈다.
 
-> **마지막 검증**: 2026-09-09 에 `mantle-kr-herald` 에서 뽑음. **새 레포에 적용해본 적 없다.**
+> **마지막 검증**: 2026-09-09 에 `mantle-kr-herald` 에서 뽑음. **2026-09-10 에 `jarvis` 에 PR 제목 검사만 적용해 CI 통과 확인** — PR #20, run `34436822886`, 스텝이 실제로 돌아 `PR title OK: ...` 를 찍었다 (`PR_TITLE` 이 비면 exit 1 이므로 배선까지 증명된다).
+>
+> **단 파일을 복사한 게 아니다.** jarvis 에 이미 있던 `ci.yml` 에 스텝 하나를 손으로 옮겼고, `typecheck:web` 절반은 조건이 안 맞아 쓰지 않았다. **`files/` 를 통째로 복사해본 적은 아직 없다** — 액션 버전과 `node-version: 24` 는 여전히 검증 안 된 값이다 (jarvis 는 Node 22 를 쓴다).
 >
 > 썩는 값: `actions/checkout@v4`, `actions/setup-node@v4`, `pnpm/action-setup@v4`, `node-version: 24`. 액션 메이저 버전과 Node 버전은 시간이 지나면 틀려지고, **틀려도 조용히 경고만 뜬다.** 쓰기 전에 현재 버전을 확인한다.
 
@@ -44,7 +46,8 @@ squash merge 를 쓰면 **PR 제목이 그대로 main 의 커밋 제목이 된�
 
 | 위치 | 무엇 |
 |---|---|
-| `node-version: 24` | 대상 레포의 Node 버전 |
+| `pnpm/action-setup@v4` 의 버전 출처 | **둘 중 하나는 있어야 한다.** 조각의 파일은 `package.json` 의 `packageManager` 필드에서 읽는 쪽을 쓴다 (파일 주석 참조). 대상 레포에 그 필드가 없으면 액션에 `version:` 을 직접 박는다 — `jarvis` 가 `version: 11` 로 그렇게 한다 (2026-09-10 관찰) |
+| `node-version: 24` | 대상 레포의 Node 버전. **pnpm 메이저가 요구하는 최소 Node 를 먼저 확인한다** — `jarvis` 는 `ci: use Node 22 (required by pnpm 11)` 로 이 이유 때문에 한 번 올렸다 (커밋 `f8aee63`) |
 | `pnpm check:pr-title` | **스크립트를 직접 써야 한다.** 조각에 안 들어 있다. `process.env.PR_TITLE` 을 읽어 그 레포가 원하는 규칙을 검사한다 |
 | `pnpm typecheck:web` | `web` 을 실제 하위 디렉터리 이름으로. tsconfig 가 여러 개면 스텝을 그만큼 늘린다 |
 | `branches: [main]` | 기본 브랜치 이름이 다르면 |
@@ -56,6 +59,8 @@ squash merge 를 쓰면 **PR 제목이 그대로 main 의 커밋 제목이 된�
 - squash merge 를 안 쓴다. 그러면 제목은 커밋 제목이 되지 않고 검사할 이유가 사라진다
 - 검사할 규칙이 없다. 커밋 제목 언어나 형식에 대한 합의가 없으면 검사도 없다
 - required status check 가 여러 개다. 이 경우 별도 job 으로 빼는 쪽이 낫다. `test` 안에 둘 이유가 사라진다
+
+**확인은 두 군데를 봐야 한다.** `repos/{owner}/{repo}/branches/main/protection` 은 레거시 branch protection 만 본다. ruleset 으로 걸어둔 레포는 여기서 `Branch not protected` 404 가 나오고, 보호가 없다고 잘못 읽게 된다 (`jarvis`, 2026-09-10). `repos/{owner}/{repo}/rulesets` 를 같이 본다.
 
 **`typecheck:web` 을 뺀다:**
 
