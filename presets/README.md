@@ -61,7 +61,7 @@ bash presets/claude/bootstrap.sh
 
 스크립트가 하는 일은 이렇다.
 
-- [`user/settings.json`](user/settings.json)의 `extraKnownMarketplaces`, `enabledPlugins`, `hooks`를 `~/.claude/settings.json`에 병합한다. **덮어쓰지 않는다.** `model`, `theme`, `effortLevel` 같은 개인 설정이 그 파일에 같이 살기 때문이다. 실제로 값이 바뀔 때만 `~/.claude/backups/`에 이전 파일을 남긴다. 바뀐 항목은 **추가와 변경을 구분해** 찍는다. 플러그인을 내린 것이 켠 것처럼 보이면 적용 결과를 눈으로 확인할 방법이 없다.
+- [`user/settings.json`](user/settings.json)의 `extraKnownMarketplaces`, `enabledPlugins`, `hooks`를 `~/.claude/settings.json`에 병합한다. `claude plugin list`를 같이 넘겨서 **설치되지 않은 플러그인의 `false`는 적지 않는다** (아래 [지우지 않고 `false`로 적는다](#지우지-않고-false로-적는다)). **덮어쓰지 않는다.** `model`, `theme`, `effortLevel` 같은 개인 설정이 그 파일에 같이 살기 때문이다. 실제로 값이 바뀔 때만 `~/.claude/backups/`에 이전 파일을 남긴다. 바뀐 항목은 **추가와 변경을 구분해** 찍는다. 플러그인을 내린 것이 켠 것처럼 보이면 적용 결과를 눈으로 확인할 방법이 없다.
 - `env`는 **빈 값일 때만** 자리를 만든다. 프리셋의 `CONTEXT7_API_KEY`가 빈 문자열이라, 그대로 덮어쓰면 이미 발급해 넣은 키를 지운다.
 - `hooks`는 `command` 기준으로 합친다. 이미 붙여 둔 다른 훅은 건드리지 않는다.
 - [`user/hooks/fanout-cost-gate.sh`](user/hooks/fanout-cost-gate.sh)를 `~/.claude/hooks/`에 복사하고 실행 권한을 준다.
@@ -216,6 +216,10 @@ CLAUDE_FANOUT_ACK=42 python3 scripts/real-trigger-eval.py --eval-set eval.json -
 | `skill-creator` | 1 | `superpowers:writing-skills`와 겹치고, 차별점인 eval은 쓸 수 없다 (SETUP-GUIDE §4) |
 
 **항목을 지우면 안 꺼진다.** 병합은 프리셋에 있는 키만 덮어쓰므로, 지운 항목은 이미 켜진 머신에서 그대로 살아 있다. 끄려면 `false`로 적어야 전파된다. 지우면 "관심 없음", `false`면 "꺼라"다.
+
+**단, 적히는 것은 설치된 것뿐이다.** 병합이 `claude plugin list`를 받아서 프리셋의 `false` 중 그 머신에 설치되지 않은 것은 적지 않고, 이미 적혀 있으면 지운다. 설치되지 않은 플러그인에 `false`가 적혀 있으면 클로드가 그것을 **"프로젝트 설정이 켰는데 설치가 안 됐다"로 읽어 세션마다 로드 에러를 낸다.** 2026-09-10 에 이 머신이 `sentry` 하나로 그 상태였고, 새 머신이면 위 표의 일곱 개가 전부 그렇게 된다.
+
+잃는 것은 없다. `false`가 하는 일은 이미 켜진 것을 끄는 것 하나뿐인데, 설치되지 않았으면 끌 것이 없다. 나중에 그 플러그인을 깔면 다음 부트스트랩이 다시 `false`로 적는다.
 
 `backend`·`dashboard`·`frontend`·`infra`·`skill-authoring` 다섯은 이유가 다르다. 프로젝트 설정이 켜는 것들이라 **캐시에는 있어야 하고 유저 기본값은 꺼져 있어야 한다.** 지워서는 그 둘을 동시에 만족시킬 수 없으니 `false`로 적는다.
 

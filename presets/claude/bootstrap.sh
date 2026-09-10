@@ -73,10 +73,16 @@ done
 # 3. 설정을 병합한다. 실제로 바뀔 때만 백업이 남는다.
 #
 #    2단계가 켜 둔 도메인 플러그인이 여기서 프리셋의 `false` 로 되돌아간다.
+#
+#    설치 목록을 넘긴다. 설치되지 않은 플러그인에 `false` 를 적으면 세션마다
+#    로드 에러가 나기 때문이다. 끌 것이 없는데 끄라고 적은 셈이라 그렇다.
 echo
 echo "설정 병합: $settings"
+installed_ids=$(mktemp)
+trap 'rm -f "$installed_ids"' EXIT
+claude plugin list --json | jq -r '.[].id' | sort -u > "$installed_ids"
 python3 "$script_dir/merge-settings.py" presets/user/settings.json "$settings" \
-  --backup-dir "$claude_home/backups"
+  --backup-dir "$claude_home/backups" --installed "$installed_ids"
 
 # 4. Serena 가 여는 창을 끈다.
 #

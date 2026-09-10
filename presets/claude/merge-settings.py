@@ -46,6 +46,30 @@ def merge_mapping(target: dict, preset: dict, label: str, changes: list[str]) ->
         target[key] = copy.deepcopy(value)
 
 
+def merge_plugins(
+    target: dict, preset: dict, installed: set[str] | None, changes: list[str]
+) -> None:
+    """`false` 는 설치된 플러그인에만 적는다.
+
+    `false` 가 하는 일은 이미 켜져 있는 것을 끄는 것 하나뿐이다. 설치되지 않은
+    플러그인에는 끌 것이 없고, 대신 세션마다 **로드 에러가 난다.** 클로드가 그
+    항목을 "프로젝트 설정이 켰는데 설치가 안 됐다"로 읽기 때문이다. 이미 적혀
+    있으면 지운다.
+
+    설치 목록을 못 받았으면 (`--installed` 없이 돌렸으면) 전부 그대로 적는다.
+    """
+    for key, value in preset.items():
+        if value is False and installed is not None and key not in installed:
+            if key in target:
+                del target[key]
+                changes.append(f"제거  enabledPlugins.{key} (설치되지 않음)")
+            continue
+        previous = target.get(key, MISSING)
+        if previous != value:
+            changes.append(describe("enabledPlugins", key, previous, value))
+        target[key] = copy.deepcopy(value)
+
+
 def merge_env(target: dict, preset: dict, changes: list[str]) -> None:
     """빈 값을 가진 프리셋 키는 자리만 만든다.
 
@@ -112,9 +136,23 @@ def main() -> int:
         type=Path,
         help="실제로 쓸 때만 대상 파일을 여기에 복사한다",
     )
+    parser.add_argument(
+        "--installed",
+        type=Path,
+        help="설치된 플러그인 id 목록 파일. 한 줄에 하나. "
+        "주면 미설치 플러그인의 false 항목을 적지 않는다",
+    )
     args = parser.parse_args()
 
     preset = json.loads(args.preset.read_text(encoding="utf-8"))
+
+    installed: set[str] | None = None
+    if args.installed:
+        installed = {
+            line.strip()
+            for line in args.installed.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        }
 
     args.target.parent.mkdir(parents=True, exist_ok=True)
     lock_path = args.target.with_name(f"{args.target.name}.lock")
@@ -129,7 +167,13 @@ def main() -> int:
 
         changes: list[str] = []
         for key in MERGED_KEYS:
-            if key in preset:
+            if key not in preset:
+                continue
+            if key == "enabledPlugins":
+                merge_plugins(
+                    target.setdefault(key, {}), preset[key], installed, changes
+                )
+            else:
                 merge_mapping(
                     target.setdefault(key, {}), preset[key], key, changes
                 )
