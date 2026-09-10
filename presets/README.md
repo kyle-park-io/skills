@@ -43,11 +43,27 @@ frontend, backend, infra 세 도메인에서 끌어와야 하는데, 도메인�
 
 노트북을 새로 사면 **이 레포를 클론해도 아무것도 켜지지 않는다.** 프로젝트 스코프는 각 작업 레포에 커밋돼 있어 클론하면 따라오지만, 유저 스코프는 `~/.claude/settings.json`에 있고 그 파일은 어느 레포에도 들어 있지 않다.
 
-순서는 이렇다.
+**1. 부트스트랩을 돌린다.**
 
-**1. 유저 스코프 설정을 병합한다.**
+```bash
+bash presets/claude/bootstrap.sh
+```
 
-[`user/settings.json`](user/settings.json)의 `extraKnownMarketplaces`와 `enabledPlugins`를 `~/.claude/settings.json`에 넣는다. **덮어쓰지 않는다.** `model`, `theme`, `effortLevel` 같은 개인 설정이 그 파일에 같이 살기 때문이다.
+[`claude/bootstrap.sh`](claude/bootstrap.sh)가 유저 스코프 병합과 훅 설치를 멱등하게 처리하고, 마지막에 게이트가 실제로 서는지 확인한다. `CLAUDE_CONFIG_DIR`을 존중하므로 임시 디렉터리를 가리켜 먼저 시험해 볼 수 있다.
+
+**손으로 하지 않는다.** 선언적인 것은 `extraKnownMarketplaces`와 `enabledPlugins`뿐이고, 훅 복사는 파일 시스템 작업이라 JSON 병합으로 대신할 수 없다. 그 한 단계가 빠진 채 설정만 병합되면 `settings.json`이 없는 스크립트를 가리키게 되고, 그때부터 **모든 Bash 호출이 그것을 실행하려 든다.** 부분 적용이 아무것도 안 한 것보다 나쁜 유일한 지점이라 순서를 스크립트에 고정했다. 훅 파일을 먼저 놓고 설정을 나중에 병합한다.
+
+이 자동화가 없어서 이미 한 번 당했다. 2026-09-09 에 게이트를 레포에 만들어 두고, 게이트가 설치되지 않은 머신에서 Opus 세션 42개를 띄워 사용량 한도를 태웠다.
+
+스크립트가 하는 일은 이렇다.
+
+- [`user/settings.json`](user/settings.json)의 `extraKnownMarketplaces`, `enabledPlugins`, `hooks`를 `~/.claude/settings.json`에 병합한다. **덮어쓰지 않는다.** `model`, `theme`, `effortLevel` 같은 개인 설정이 그 파일에 같이 살기 때문이다. 실제로 값이 바뀔 때만 `~/.claude/backups/`에 이전 파일을 남긴다.
+- `env`는 **빈 값일 때만** 자리를 만든다. 프리셋의 `CONTEXT7_API_KEY`가 빈 문자열이라, 그대로 덮어쓰면 이미 발급해 넣은 키를 지운다.
+- `hooks`는 `command` 기준으로 합친다. 이미 붙여 둔 다른 훅은 건드리지 않는다.
+- [`user/hooks/fanout-cost-gate.sh`](user/hooks/fanout-cost-gate.sh)를 `~/.claude/hooks/`에 복사하고 실행 권한을 준다.
+- 훅에 가짜 페이로드를 먹여 세션 42개짜리 명령이 차단되는지, `CLAUDE_FANOUT_ACK=42`가 통과되는지, 무관한 명령이 통과되는지 셋 다 확인한다. 하나라도 어긋나면 0이 아닌 값으로 죽는다.
+
+마지막 항목이 있는 이유는 Codex 부트스트랩이 `plugin list`로 끝나는 것과 같다. 설치했다는 것과 동작한다는 것은 다르고, **이 훅은 동작하지 않아도 조용하다.**
 
 `extraKnownMarketplaces`가 마켓플레이스 등록을 대신하므로 `claude plugin marketplace add`를 따로 칠 필요가 없다. 이 한 블록이 없으면 `enabledPlugins`의 `@kyle-skills` 항목이 어느 마켓플레이스인지 몰라 해석되지 않는다.
 
@@ -59,25 +75,15 @@ frontend, backend, infra 세 도메인에서 끌어와야 하는데, 도메인�
 claude plugin marketplace add anthropics/claude-plugins-official
 ```
 
-**2. 훅 스크립트를 복사한다.**
-
-`settings.json`의 `hooks` 블록이 `~/.claude/hooks/fanout-cost-gate.sh`를 부른다. **파일이 없으면 모든 Bash 호출이 없는 스크립트를 실행하려 든다.**
-
-```bash
-mkdir -p ~/.claude/hooks
-cp presets/user/hooks/fanout-cost-gate.sh ~/.claude/hooks/
-chmod +x ~/.claude/hooks/fanout-cost-gate.sh
-```
-
 무엇을 하는 훅인지는 아래 [병렬 실행 비용 훅](#병렬-실행-비용-훅).
 
-**3. `env`를 채운다.**
+**2. `env`를 채운다.**
 
 `CONTEXT7_API_KEY`는 레포에 빈 값으로 두었다. [context7.com/dashboard](https://context7.com/dashboard)에서 발급해 넣는다. 비워두면 401이 난다.
 
 **토큰이 든 `settings.json`을 머신 간에 그대로 복사하지 않는다.** 레포의 프리셋을 병합하고 값은 새로 발급하는 쪽이 맞다.
 
-**4. 작업 레포를 클론한다.**
+**3. 작업 레포를 클론한다.**
 
 프로젝트 스코프는 여기서 자동으로 붙는다. 커밋된 `<repo>/.claude/settings.json`이 `backend@kyle-skills` 같은 항목을 이미 들고 있고, 1번에서 마켓플레이스를 알려줬으므로 해석된다.
 
@@ -93,10 +99,19 @@ bash presets/codex/bootstrap.sh
 이 스크립트는 `kyle-skills` 마켓플레이스와 공통 작업 절차인
 `superpowers@openai-curated-remote`, `process@kyle-skills`를 멱등하게 설치하고
 이미 있으면 최신 마켓플레이스 버전으로 갱신한다.
-프로젝트용 `backend`, `dashboard`, `frontend`, `infra`도 로컬 캐시에 설치하지만
-사용자 기본값은 `false`로 되돌린다. 각 레포의 `.codex/config.toml`이 필요한
-도메인만 `true`로 덮어쓴다. 아직 비어 있는 `architecture`와
-`skill-authoring`은 첫 스킬이 들어온 뒤 캐시 목록에 추가한다.
+프로젝트용 도메인도 로컬 캐시에 설치하지만 사용자 기본값은 `false`로 되돌린다.
+각 레포의 `.codex/config.toml`이 필요한 도메인만 `true`로 덮어쓴다.
+
+**캐시 목록의 기준은 "비어 있는가"가 아니라 "참조되는가"다.** 어느 프로젝트
+설정에서든 `true`로 켜는 도메인은 전부 캐시에 있어야 한다. Codex는 사용자
+캐시에 없는 플러그인을 프로젝트에서 켤 수 없기 때문이다. 지금 캐시에 드는 것은
+`backend`, `dashboard`, `frontend`, `infra`, `skill-authoring` 다섯이고, 이 중
+`dashboard`·`infra`·`skill-authoring`은 스킬이 0개다. **비어 있어도 참조되면
+넣는다.** 스킬 0개짜리 플러그인은 컨텍스트를 늘리지 않으므로 비용이 없고, 첫
+스킬이 들어온 날 배선을 다시 하지 않아도 된다.
+
+`architecture`는 어느 프로젝트 설정도 참조하지 않아 빠져 있다. 비어서가 아니라
+쓰는 자리가 아직 없어서다. 첫 프리셋이 참조하면 그때 캐시 목록에 넣는다.
 
 플러그인으로 묶지 않은 프로젝트 전용 스킬은 `.agents/skills/`에 둔다. Codex는
 이 경로를 현재 디렉터리부터 레포 루트까지 읽고 심볼릭 링크도 따라간다.
@@ -141,34 +156,44 @@ CLAUDE_FANOUT_ACK=42 python3 scripts/real-trigger-eval.py --eval-set eval.json -
 
 ## user/
 
-유저 스코프 원본. 플러그인 9개. 공식 8개와 내 도메인 플러그인 1개다.
+유저 스코프 원본. 켜는 것 7개, 끄는 것 5개다.
 
 이 디렉터리의 JSON과 훅은 Claude Code 전용이다. Codex의 공통 설치 목록은
 [`codex/bootstrap.sh`](codex/bootstrap.sh)가 맡는다.
 
-**여기 둘 조건은 "언제 쓸지 모른다"가 아니라 "어느 레포에서든 쓴다"다.** 스킬 30개를 넘기지 않는다 (현재 26개). 근거는 [`../docs/SETUP-GUIDE.md`](../docs/SETUP-GUIDE.md) §1, §3.
+**여기 둘 조건은 "언제 쓸지 모른다"가 아니라 "어느 레포에서든 쓴다"다.** 스킬 30개를 넘기지 않는다 (현재 17개). 근거는 [`../docs/SETUP-GUIDE.md`](../docs/SETUP-GUIDE.md) §1, §3.
 
-| 플러그인 | 역할 |
-|---|---|
-| `superpowers` | 작업 절차 |
-| `skill-creator` | 스킬 제작 |
-| `claude-code-setup` | 레포별 자동화 진단 |
-| `claude-md-management` | 프로젝트 규약 관리 |
-| `serena` | 시맨틱 코드 분석 |
-| `context7` | 최신 라이브러리 문서 조회 |
-| `github` | 이슈·PR·CI |
-| `sentry` | 에러·스택 트레이스 |
-| `process@kyle-skills` | 내 작업 절차 스킬 |
+| 플러그인 | 스킬 | 역할 |
+|---|---:|---|
+| `superpowers` | 14 | 작업 절차 |
+| `claude-code-setup` | 1 | 레포별 자동화 진단 (제안만, 쓰지는 않음) |
+| `claude-md-management` | 1 | 프로젝트 규약 관리 |
+| `process@kyle-skills` | 1 | 내 작업 절차 스킬 |
+| `serena` | 0 | 시맨틱 코드 분석 (MCP) |
+| `context7` | 0 | 최신 라이브러리 문서 조회 (MCP) |
+| `github` | 0 | 이슈·PR·CI (MCP) |
 
-**내 도메인 플러그인도 똑같이 센다.** 지금은 스킬 26개라 여유가 있지만, 도메인에 스킬을 채우면 금방 찬다. 아직 비어 있는 `architecture@kyle-skills`는 첫 스킬이 들어온 뒤 추가한다. `skill-authoring@kyle-skills`는 스킬을 쓰는 자리가 이 레포뿐이라 여기 넣지 않고 `skills` 레포의 프로젝트 스코프로 뒀다.
+**내 도메인 플러그인도 똑같이 센다.** 아직 비어 있는 `architecture@kyle-skills`는 첫 스킬이 들어온 뒤 추가한다. `skill-authoring@kyle-skills`는 스킬을 쓰는 자리가 이 레포뿐이라 여기 넣지 않고 `skills` 레포의 프로젝트 스코프로 뒀다.
 
 `env.CONTEXT7_API_KEY`는 빈 값으로 두었다. [context7.com/dashboard](https://context7.com/dashboard)에서 발급해 채운다. 비워두면 401이 난다. 이유는 SETUP-GUIDE §7.
 
-**여기 없는 것.** `vercel`, `frontend-design`, `playwright`는 유저 스코프에서 내렸다. 셋 다 특정 스택 전용이라 위 조건을 통과하지 못한다. `project/nextjs-vercel`로 옮겼다.
+### 지우지 않고 `false`로 적는다
+
+| 플러그인 | 스킬 | 왜 내렸나 |
+|---|---:|---|
+| `vercel` | 33 | 특정 스택 전용. `project/nextjs-vercel`이 다시 켠다 |
+| `frontend-design` | 9 | 프론트엔드 전용. 같은 프로젝트 프리셋으로 |
+| `sentry` | 8 | 특정 SaaS를 붙인 레포만. 프로젝트 스코프 |
+| `playwright` | 0 | 프론트엔드 전용 (MCP) |
+| `skill-creator` | 1 | `superpowers:writing-skills`와 겹치고, 차별점인 eval은 쓸 수 없다 (SETUP-GUIDE §4) |
+
+**항목을 지우면 안 꺼진다.** 병합은 프리셋에 있는 키만 덮어쓰므로, 지운 항목은 이미 켜진 머신에서 그대로 살아 있다. 끄려면 `false`로 적어야 전파된다. 지우면 "관심 없음", `false`면 "꺼라"다.
+
+Codex 쪽 [`codex/bootstrap.sh`](codex/bootstrap.sh)가 도메인 플러그인을 캐시에 깔고 사용자 기본값을 `false`로 되돌리는 것과 같은 패턴이다. 유저 스코프에서 끄고 각 레포의 프로젝트 설정이 필요한 것만 켠다.
 
 ```bash
-# 적용: 기존 설정과 병합할 것. 덮어쓰면 model·theme 같은 개인 설정이 날아간다
-$EDITOR ~/.claude/settings.json
+# 적용. 병합이라 model·theme 같은 개인 설정은 남는다
+bash presets/claude/bootstrap.sh
 ```
 
 ---
@@ -182,6 +207,12 @@ $EDITOR ~/.claude/settings.json
 cp -r presets/project/nextjs-vercel/.claude <대상 레포>/
 cp -r presets/project/nextjs-vercel/.codex <대상 레포>/
 ```
+
+**Codex 쪽은 지금 도메인 활성화만 있다.** 위 표의 Claude 공식 플러그인에 대응하는
+MCP 서버를 `.codex/config.toml`에 넣지 않았다. 카탈로그가 1:1로 대응하지 않아
+각각을 직접 찾아 구성하고 실제로 붙는지 확인해야 하는데, 아직 재지 않았다.
+**확인하지 않은 설정을 커밋된 프리셋에 넣지 않는다.** 세션 시작 때 깨지면 클론한
+사람 전부가 같이 깨진다. 측정한 뒤 채운다.
 
 | 프리셋 | Claude 공식 플러그인 | 자체 도메인, 양쪽 공통 |
 |---|---|---|
