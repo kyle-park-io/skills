@@ -57,7 +57,7 @@ bash presets/claude/bootstrap.sh
 
 스크립트가 하는 일은 이렇다.
 
-- [`user/settings.json`](user/settings.json)의 `extraKnownMarketplaces`, `enabledPlugins`, `hooks`를 `~/.claude/settings.json`에 병합한다. **덮어쓰지 않는다.** `model`, `theme`, `effortLevel` 같은 개인 설정이 그 파일에 같이 살기 때문이다. 실제로 값이 바뀔 때만 `~/.claude/backups/`에 이전 파일을 남긴다.
+- [`user/settings.json`](user/settings.json)의 `extraKnownMarketplaces`, `enabledPlugins`, `hooks`를 `~/.claude/settings.json`에 병합한다. **덮어쓰지 않는다.** `model`, `theme`, `effortLevel` 같은 개인 설정이 그 파일에 같이 살기 때문이다. 실제로 값이 바뀔 때만 `~/.claude/backups/`에 이전 파일을 남긴다. 바뀐 항목은 **추가와 변경을 구분해** 찍는다. 플러그인을 내린 것이 켠 것처럼 보이면 적용 결과를 눈으로 확인할 방법이 없다.
 - `env`는 **빈 값일 때만** 자리를 만든다. 프리셋의 `CONTEXT7_API_KEY`가 빈 문자열이라, 그대로 덮어쓰면 이미 발급해 넣은 키를 지운다.
 - `hooks`는 `command` 기준으로 합친다. 이미 붙여 둔 다른 훅은 건드리지 않는다.
 - [`user/hooks/fanout-cost-gate.sh`](user/hooks/fanout-cost-gate.sh)를 `~/.claude/hooks/`에 복사하고 실행 권한을 준다.
@@ -79,7 +79,14 @@ claude plugin marketplace add anthropics/claude-plugins-official
 
 **2. `env`를 채운다.**
 
-`CONTEXT7_API_KEY`는 레포에 빈 값으로 두었다. [context7.com/dashboard](https://context7.com/dashboard)에서 발급해 넣는다. 비워두면 401이 난다.
+레포에는 키 두 개를 빈 값으로 두었다. 비었을 때 벌어지는 일이 서로 다르다.
+
+| 키 | 비워두면 | 발급처 |
+|---|---|---|
+| `CONTEXT7_API_KEY` | 익명으로 연결된다. rate limit 만 낮다 | [context7.com/dashboard](https://context7.com/dashboard) |
+| `GITHUB_PERSONAL_ACCESS_TOKEN` | **github MCP 가 400 으로 죽는다** | [github.com/settings/tokens](https://github.com/settings/tokens) |
+
+github 은 `Authorization: Bearer ${GITHUB_PERSONAL_ACCESS_TOKEN}` 을 그대로 보내므로 변수가 없으면 빈 Bearer 가 나간다. 토큰을 붙이지 않을 거라면 `enabledPlugins`에서 `github`을 `false`로 내리는 편이 낫다. 죽은 서버를 켜 둘 이유가 없고, `gh` CLI가 인증돼 있으면 이슈·PR·CI는 그쪽으로도 된다. 자세한 것은 SETUP-GUIDE §7.
 
 **토큰이 든 `settings.json`을 머신 간에 그대로 복사하지 않는다.** 레포의 프리셋을 병합하고 값은 새로 발급하는 쪽이 맞다.
 
@@ -161,28 +168,37 @@ CLAUDE_FANOUT_ACK=42 python3 scripts/real-trigger-eval.py --eval-set eval.json -
 이 디렉터리의 JSON과 훅은 Claude Code 전용이다. Codex의 공통 설치 목록은
 [`codex/bootstrap.sh`](codex/bootstrap.sh)가 맡는다.
 
-**여기 둘 조건은 "언제 쓸지 모른다"가 아니라 "어느 레포에서든 쓴다"다.** 스킬 30개를 넘기지 않는다 (현재 17개). 근거는 [`../docs/SETUP-GUIDE.md`](../docs/SETUP-GUIDE.md) §1, §3.
+**여기 둘 조건은 "언제 쓸지 모른다"가 아니라 "어느 레포에서든 쓴다"다.** 스킬 30개를 넘기지 않는다 (현재 21개. `~/.claude/skills/`의 4개까지 세면 25개). 근거는 [`../docs/SETUP-GUIDE.md`](../docs/SETUP-GUIDE.md) §1, §3.
 
-| 플러그인 | 스킬 | 역할 |
-|---|---:|---|
-| `superpowers` | 14 | 작업 절차 |
-| `claude-code-setup` | 1 | 레포별 자동화 진단 (제안만, 쓰지는 않음) |
-| `claude-md-management` | 1 | 프로젝트 규약 관리 |
-| `process@kyle-skills` | 1 | 내 작업 절차 스킬 |
-| `serena` | 0 | 시맨틱 코드 분석 (MCP) |
-| `context7` | 0 | 최신 라이브러리 문서 조회 (MCP) |
-| `github` | 0 | 이슈·PR·CI (MCP) |
+숫자는 `claude plugin details <플러그인>`으로 열거했다 (2026-09-10).
+
+| 플러그인 | 스킬 | 상시 토큰 | 역할 |
+|---|---:|---:|---|
+| `superpowers` | 14 | ~688 | 작업 절차 |
+| `commit-commands` | 3 | ~103 | 커밋·푸시·PR. 레포마다 있다 |
+| `claude-md-management` | 2 | ~175 | 프로젝트 규약 관리 |
+| `claude-code-setup` | 1 | ~139 | 레포별 자동화 진단 (제안만, 쓰지는 않음) |
+| `process@kyle-skills` | 1 | ~242 | 내 작업 절차 스킬 |
+| `serena` | 0 | ~0 | 시맨틱 코드 분석 (MCP) |
+| `context7` | 0 | ~0 | 최신 라이브러리 문서 조회 (MCP) |
+| `github` | 0 | ~0 | 이슈·PR·CI (MCP) |
+| 합 | **21** | **~1,347** | |
+
+**`commit-commands`를 프리셋에 적어 넣었다.** 이미 머신에 켜져 있었는데 프리셋에는 항목이 없었다. 아래 [지우지 않고 `false`로 적는다](#지우지-않고-false로-적는다)의 규칙이 그대로 적용되는 자리다. 적지 않으면 "관심 없음"이라 머신마다 상태가 갈린다.
+
+**MCP 전용 셋은 상시 0이다.** 툴 스키마가 컨텍스트에 상주하지 않고 쓸 때 불려온다. 그래서 툴 개수로 유저 스코프를 판단하지 않는다. 근거는 SETUP-GUIDE §3.
 
 **내 도메인 플러그인도 똑같이 센다.** 아직 비어 있는 `architecture@kyle-skills`는 첫 스킬이 들어온 뒤 추가한다. `skill-authoring@kyle-skills`는 스킬을 쓰는 자리가 이 레포뿐이라 여기 넣지 않고 `skills` 레포의 프로젝트 스코프로 뒀다.
 
-`env.CONTEXT7_API_KEY`는 빈 값으로 두었다. [context7.com/dashboard](https://context7.com/dashboard)에서 발급해 채운다. 비워두면 401이 난다. 이유는 SETUP-GUIDE §7.
+`env`의 키 두 개는 빈 값으로 두었다. `CONTEXT7_API_KEY`는 비워도 익명으로 연결되고 rate limit 만 낮다. `GITHUB_PERSONAL_ACCESS_TOKEN`은 비면 github MCP 가 400 으로 죽는다. 이유는 SETUP-GUIDE §7.
 
 ### 지우지 않고 `false`로 적는다
 
 | 플러그인 | 스킬 | 왜 내렸나 |
 |---|---:|---|
 | `vercel` | 33 | 특정 스택 전용. `project/nextjs-vercel`이 다시 켠다 |
-| `frontend-design` | 9 | 프론트엔드 전용. 같은 프로젝트 프리셋으로 |
+| `telegram` | 2 | 서버가 `bun run`으로 뜬다. bun 이 없는 머신에서는 서버가 죽은 채 스킬 2개만 매 세션 162토큰씩 실린다. 쓰려면 bun 을 먼저 깔고 `true`로 되돌린다 |
+| `frontend-design` | 1 | 프론트엔드 전용. 같은 프로젝트 프리셋으로 |
 | `sentry` | 8 | 특정 SaaS를 붙인 레포만. 프로젝트 스코프 |
 | `playwright` | 0 | 프론트엔드 전용 (MCP) |
 | `skill-creator` | 1 | `superpowers:writing-skills`와 겹치고, 차별점인 eval은 쓸 수 없다 (SETUP-GUIDE §4) |

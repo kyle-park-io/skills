@@ -4,6 +4,8 @@
 
 측정 기준일 Claude Code 2026-09-09 · Codex CLI 2026-09-10 (0.153.4)
 
+**재측정 2026-09-10.** 유저 스코프를 프리셋으로 정리한 뒤 새 세션에서 다시 셌다. 바뀐 곳은 §1의 재측정 표, §3의 상시 토큰과 MCP 예산, §7의 context7 항목이다. 이전 숫자는 지우지 않고 남겨 뒀다. 무엇이 언제 바뀌었는지가 판단의 재료다.
+
 §1에서 §3까지의 플러그인 수와 내장 스킬 수, `.claude/settings.json`, MCP 문제
 해결은 Claude Code에서 측정한 운영 기준이다. Codex에도 컨텍스트 예산 원칙은
 적용하지만 내장 및 설치된 스킬 목록은 현재 환경에서 별도로 센다. 자체 플러그인은
@@ -39,6 +41,21 @@
 플러그인 스킬 54개 중 **vercel 하나가 36개**다. `playwright`와 `context7`은 MCP 전용이라 스킬 카운트에 잡히지 않는다.
 
 > 열거로 확인한 건 53개(vercel 36 · superpowers 14 · 단일 스킬 플러그인 3). 보고값 54와의 차이 1개는 미확인으로 남긴다.
+
+### 재측정 2026-09-10
+
+위 표는 정리 전이다. 부트스트랩으로 유저 스코프를 프리셋에 맞춘 뒤 새 세션에서 다시 셌다.
+
+| 구분 | 개수 | 성격 |
+|---|---:|---|
+| Claude Code 내장 | 16 | 제거 불가 |
+| 유저 스코프 플러그인이 싣는 스킬 | 21 | §3 표 |
+| `~/.claude/skills/` | 4 | 플러그인이 아닌 스킬 디렉터리 |
+| 합 | **41** | |
+
+**`~/.claude/skills/`를 세지 않고 있었다.** 심볼릭 링크로 걸린 스킬 4개(`computer-use`, `find-skills`, `orca-cli`, `orchestration`)가 플러그인과 무관하게 매 세션 실린다. 플러그인만 세면 예산이 4개만큼 낙관적으로 잡힌다. `enabledPlugins`를 아무리 정리해도 이쪽은 줄지 않는다.
+
+숫자는 `claude plugin details <플러그인>`으로 열거했다. 이 명령이 컴포넌트 목록과 상시 토큰 추정치를 같이 준다. 세션 시작 배너의 숫자보다 이쪽을 믿는다.
 
 ---
 
@@ -108,28 +125,40 @@ Codex 원격 카탈로그의 `vercel`은 현재 `GLOBAL` 항목이라 이 방식
 
 §2가 무엇을 통과시킬지를 정하고, 여기서는 통과한 것이 몇 개까지 들어갈 수 있는지를 정한다. **상한은 스킬 30개다.**
 
-**세는 단위는 플러그인이 아니라 스킬이다.** 플러그인 개수는 실제 비용을 감춘다. 유저 스코프는 플러그인 7개인데 분포가 전혀 고르지 않다.
+**세는 단위는 플러그인이 아니라 스킬이다.** 플러그인 개수는 실제 비용을 감춘다. 유저 스코프는 플러그인 8개인데 분포가 전혀 고르지 않다.
 
-| 플러그인 | 스킬 | 어느 레포에서든 쓰는 이유 |
-|---|---:|---|
-| `superpowers` | 14 | 작업 절차. 언어·스택을 한 줄도 전제하지 않는다 |
-| `claude-code-setup` | 1 | 레포마다 한 번은 자동화를 정한다. 스택을 가리지 않는다 |
-| `claude-md-management` | 1 | 모든 레포가 규약 파일을 갖는다 |
-| `process@kyle-skills` | 1 | 내 작업 관례. 레포와 무관하다 |
-| `serena` | 0 | 시맨틱 코드 분석. 언어 중립 (MCP) |
-| `context7` | 0 | 라이브러리 문서 조회. 어느 스택에서나 (MCP) |
-| `github` | 0 | 이슈·PR·CI (MCP) |
-| 합 | **17** | |
+| 플러그인 | 스킬 | 상시 토큰 | 어느 레포에서든 쓰는 이유 |
+|---|---:|---:|---|
+| `superpowers` | 14 | ~688 | 작업 절차. 언어·스택을 한 줄도 전제하지 않는다 |
+| `commit-commands` | 3 | ~103 | 커밋·푸시·PR. 레포마다 있다 |
+| `claude-md-management` | 2 | ~175 | 모든 레포가 규약 파일을 갖는다 |
+| `claude-code-setup` | 1 | ~139 | 레포마다 한 번은 자동화를 정한다. 스택을 가리지 않는다 |
+| `process@kyle-skills` | 1 | ~242 | 내 작업 관례. 레포와 무관하다 |
+| `serena` | 0 | ~0 | 시맨틱 코드 분석. 언어 중립 (MCP) |
+| `context7` | 0 | ~0 | 라이브러리 문서 조회. 어느 스택에서나 (MCP) |
+| `github` | 0 | ~0 | 이슈·PR·CI (MCP) |
+| 합 | **21** | **~1,347** | |
 
-`superpowers` 하나가 거의 전부고, MCP 전용 셋은 스킬을 하나도 싣지 않는다. "플러그인 7개"라는 숫자로는 이 차이가 안 보인다.
+`superpowers` 하나가 거의 전부고, MCP 전용 셋은 스킬을 하나도 싣지 않는다. "플러그인 8개"라는 숫자로는 이 차이가 안 보인다.
+
+**추정치는 SessionStart 훅을 빼고 센다.** `claude plugin details superpowers`는 훅을 `harness-only, no model context cost`로 적는다. 그런데 그 훅은 `using-superpowers` 스킬 본문(3.1KB, 대략 900토큰)을 매 세션 시스템 컨텍스트에 그대로 주입한다. superpowers의 실제 상시 비용은 표의 688이 아니라 1,600 근처다. **훅이 달린 플러그인은 추정치를 그대로 믿지 않는다.**
 
 **에피소드성 스킬도 유저 스코프다.** `claude-code-setup`과 `claude-md-management`는 레포를 세울 때 한 번 쓰고 만다. 그래도 여기 두는 것은 §2의 기준이 빈도가 아니라 **전제**이기 때문이다. 둘 다 스택을 가리지 않으므로 통과한다. 자주 안 쓴다는 이유로 내리기 시작하면 기준이 둘이 된다.
 
-**MCP 전용 플러그인은 별도 예산이다.** 이들이 싣는 건 스킬 설명문이 아니라 MCP 툴 정의다. 같은 서버를 `claude mcp add`로 직접 붙여도 툴 정의는 똑같이 들어가므로, 플러그인을 내린다고 컨텍스트가 줄지 않는다. 스킬 예산과 섞어 세지 않는다.
+**MCP 전용 플러그인은 예산을 거의 쓰지 않는다 (2026-09-10 정정).** 원래 여기에는 "이들이 싣는 건 MCP 툴 정의이므로 별도 예산"이라고 적어 뒀다. 지금 빌드에서는 성립하지 않는다. 툴은 이름만 시스템 리마인더로 오고 **스키마는 실제로 쓸 때 가져온다.** `claude plugin details`도 같은 말을 한다.
 
-여기에 Claude Code 내장 16개가 항상 더해진다. 그래서 이 환경의 상주 스킬은 16 + 17 = **33개**다. 상한은 내장을 뺀 유저 스코프에만 걸리므로 남은 자리는 30 - 17 = **13개**다.
+```
+MCP servers (1)  serena  (tool schemas resolved at runtime; not counted)
+Always-on:   ~0 tok   added to every session
+```
 
-**내 도메인 플러그인도 똑같이 센다.** 아직 비어 있는 `architecture@kyle-skills`는 첫 스킬이 들어온 뒤 등록한다. 도메인에 스킬을 채우면 남은 14개는 금방 찬다.
+`serena`는 툴 29개, `context7`은 2개인데 둘 다 상시 추정치가 0이다. 남는 상시 비용은 서버가 붙이는 instructions 블록뿐이고, serena는 한 줄, context7은 한 문단이다. **그래서 MCP 서버는 스킬보다 싸다. 툴 개수로 유저 스코프를 판단하지 않는다.**
+
+정작 큰 쪽은 플러그인이 아니라 계정에 붙은 커넥터다. 이 세션에 실린 Higgsfield 하나가 툴 100개에 긴 instructions 블록을 얹는다 (Gmail 29 · Drive 11 · Calendar 9). 플러그인 MCP 셋을 다 합쳐도 31개다. `enabledPlugins`를 조여도 이쪽은 손대지 못한다.
+
+여기에 Claude Code 내장 16개와 `~/.claude/skills/` 4개가 항상 더해진다. 그래서 이 환경의 상주 스킬은 16 + 21 + 4 = **41개**다. 상한은 내장을 뺀 유저 스코프에 걸리므로 남은 자리는 30 - 25 = **5개**다. §1 재측정에서 스킬 디렉터리를 세기 시작하면서 여유가 13개에서 5개로 줄었다.
+
+**내 도메인 플러그인도 똑같이 센다.** 아직 비어 있는 `architecture@kyle-skills`는 첫 스킬이 들어온 뒤 등록한다. 도메인에 스킬을 채우면 남은 5개는 금방 찬다.
 
 **추가는 한 번에 3~4개까지.** 며칠 써보고 다음 묶음으로 간다. 한꺼번에 20개를 켜면 어느 게 효과였는지 영영 알 수 없다.
 
@@ -335,39 +364,35 @@ Codex에서는 현재 세션의 스킬 목록을 확인한다. 비는 건 공통
 
 ## 7. 트러블슈팅
 
-### context7 401은 플러그인 버그다
+### context7 401은 2026-09-09까지의 이야기다
 
-**증상**
+**증상 (2026-09-09)**
 
 ```
 plugin:context7:context7 - ✘ Failed to connect
 Server rejected the configured Authorization header (HTTP 401)
 ```
 
-**원인**
+**당시 원인**
 
-README에는 "API 키는 선택 사항, 없으면 익명 연결"이라 적혀 있다. 그런데 401이 난다. 엔드포인트를 직접 찔러본 결과다.
+플러그인이 쓰는 URL에는 `?client=claude-code-plugin`이 붙어 있고, 이 경로는 Authorization 헤더가 존재하고 비어 있지 않기만 하면 통과했다. 키 내용은 검증하지도 않았다. 그런데 플러그인 설정이 `"Authorization": "${CONTEXT7_API_KEY:-}"`라, 변수가 없으면 빈 헤더가 나가 정확히 401 조건에 걸렸다.
 
-| 요청 | 응답 |
-|---|---:|
-| `/mcp` · Authorization 없음 | 200 |
-| `/mcp?client=claude-code-plugin` · 없음 | **401** |
-| `/mcp?client=claude-code-plugin` · 빈 값 | **401** |
-| `/mcp?client=claude-code-plugin` · 아무 값이나 | 200 |
+**2026-09-10 재측정**
 
-플러그인이 쓰는 URL에는 `?client=claude-code-plugin`이 붙어 있고, **이 경로는 Authorization 헤더가 존재하고 비어 있지 않기만 하면 통과한다.** 키 내용은 검증하지도 않는다.
+같은 네 가지 요청을 다시 보냈다. 플러그인 설정은 그대로다.
 
-그런데 플러그인 설정이 이렇다.
+| 요청 | 2026-09-09 | 2026-09-10 |
+|---|---:|---:|
+| `/mcp` · Authorization 없음 | 200 | 200 |
+| `/mcp?client=claude-code-plugin` · 없음 | 401 | **401** |
+| `/mcp?client=claude-code-plugin` · 빈 값 | **401** | **200** |
+| `/mcp?client=claude-code-plugin` · 아무 값이나 | 200 | 200 |
 
-```json
-{ "headers": { "Authorization": "${CONTEXT7_API_KEY:-}" } }
-```
+**빈 값 행만 바뀌었다.** 서버가 빈 Authorization 헤더를 받아주기 시작했다. 빈 `CONTEXT7_API_KEY`로 실제 문서 조회가 되는 것도 확인했다. 플러그인 설명도 `Works anonymously out of the box; set CONTEXT7_API_KEY for higher rate limits`라고 적는다.
 
-`:-`의 기본값이 빈 문자열이라, 변수가 unset이면 빈 헤더가 나가 정확히 401 조건에 걸린다. README의 "익명으로 동작"은 쿼리 파라미터 없는 맨 URL 기준이라 이 경로에선 성립하지 않는다.
+**그래서 키는 연결 조건이 아니라 rate limit 문제다.** 부트스트랩의 경고 문구도 그렇게 고쳤다.
 
-**해결하는 자리는 `~/.bashrc`가 아니다**
-
-bashrc는 **대화형 bash 셸에서만** 읽힌다. IDE 확장이나 데스크톱 앱에서 하네스를 띄우면 적용되지 않는다. `~/.claude/settings.json`의 `env` 블록은 실행 경로와 무관하게 먹는다.
+**여전히 유효한 것 둘.** 헤더 자체가 없으면 이 URL은 아직 401이다. `env` 블록을 지우거나 다른 하네스가 빈 헤더를 생략하면 그때 다시 본다. 그리고 값을 넣는 자리는 `~/.bashrc`가 아니다. bashrc는 **대화형 bash 셸에서만** 읽히므로 IDE 확장이나 데스크톱 앱에서 띄운 하네스에는 적용되지 않는다. `~/.claude/settings.json`의 `env` 블록은 실행 경로와 무관하게 먹는다.
 
 ```json
 {
@@ -383,13 +408,32 @@ bashrc는 **대화형 bash 셸에서만** 읽힌다. IDE 확장이나 데스크�
 claude mcp list | grep context7   # 적용 확인
 ```
 
-### playwright 연결 실패
+### github MCP 400
+
+```
+plugin:github:github (400): bad request: Authorization header is badly formatted
+```
+
+context7과 같은 모양이고 결말이 다르다. 설정이 `"Authorization": "Bearer ${GITHUB_PERSONAL_ACCESS_TOKEN}"`인데 변수가 없으면 `Bearer ` 만 나간다. **이쪽 서버는 빈 값을 받아주지 않는다.**
+
+`~/.claude/settings.json`의 `env`에 토큰을 넣거나, 붙이지 않을 거라면 `enabledPlugins`에서 `false`로 내린다. `gh` CLI가 이미 인증돼 있으면 이슈·PR·CI는 그쪽으로도 된다. 죽은 서버를 켜 두면 매 세션 연결 실패만 반복한다.
+
+### 연결 실패 메시지는 원인을 말해주지 않는다
 
 ```
 Skipping connection (recent failure cached, retries automatically in 15 min)
 ```
 
-일시적이다. 15분 후 자동 재시도되며 대개 스스로 복구된다. 손대지 않는다.
+**이 메시지는 일시적 실패에도 나오고 영구적 실패에도 나온다.** playwright에서 봤을 때는 일시적이었고 저절로 복구됐다. telegram에서 같은 메시지를 봤을 때는 아니었다. 이 플러그인은 `bun run`으로 서버를 띄우는데 그 머신에 bun이 없었다. 15분을 기다려도, 며칠을 기다려도 복구되지 않는다.
+
+**먼저 확인할 것은 서버가 요구하는 실행 파일이다.** 15분을 기다리는 건 그다음이다.
+
+```bash
+cat ~/.claude/plugins/cache/<마켓플레이스>/<플러그인>/<버전>/.mcp.json
+command -v bun    # 그 파일의 command 에 적힌 것
+```
+
+실행 파일이 없는 서버는 스킬만 남기고 죽는다. telegram은 서버가 못 뜨는 채로 스킬 2개를 매 세션 162토큰씩 싣고 있었다. **연결 실패는 조용하지만 공짜가 아니다.**
 
 ---
 

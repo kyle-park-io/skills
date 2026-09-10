@@ -16,12 +16,33 @@ import tempfile
 
 MERGED_KEYS = ("extraKnownMarketplaces", "enabledPlugins")
 
+MISSING = object()
+
+
+def render(value: object) -> str:
+    """스칼라만 값을 보여준다. 마켓플레이스 객체를 통째로 찍어봐야 안 읽힌다."""
+    if isinstance(value, (bool, int, float, str)) or value is None:
+        return json.dumps(value, ensure_ascii=False)
+    return "..."
+
+
+def describe(label: str, key: str, previous: object, value: object) -> str:
+    """추가와 변경을 구분해서 적는다.
+
+    둘을 같은 기호로 찍으면 플러그인을 내린 것이 켠 것처럼 보인다. 이 스크립트의
+    출력이 적용 결과를 확인하는 유일한 자리라 그 구분이 곧 검증이다.
+    """
+    if previous is MISSING:
+        return f"추가  {label}.{key} = {render(value)}"
+    return f"변경  {label}.{key}: {render(previous)} -> {render(value)}"
+
 
 def merge_mapping(target: dict, preset: dict, label: str, changes: list[str]) -> None:
     """프리셋 키를 덮어쓴다. 대상에만 있는 키는 남긴다."""
     for key, value in preset.items():
-        if target.get(key) != value:
-            changes.append(f"{label}.{key}")
+        previous = target.get(key, MISSING)
+        if previous != value:
+            changes.append(describe(label, key, previous, value))
         target[key] = copy.deepcopy(value)
 
 
@@ -35,7 +56,7 @@ def merge_env(target: dict, preset: dict, changes: list[str]) -> None:
         if target.get(key):
             continue
         if key not in target:
-            changes.append(f"env.{key}")
+            changes.append(f"추가  env.{key} = \"\" (값은 직접 채운다)")
         target[key] = value
 
 
@@ -53,7 +74,7 @@ def merge_hooks(target: dict, preset: dict, changes: list[str]) -> None:
             )
             if entry is None:
                 target_entries.append(copy.deepcopy(preset_entry))
-                changes.append(f"hooks.{event}[{matcher}]")
+                changes.append(f"추가  hooks.{event}[{matcher}]")
                 continue
 
             hooks = entry.setdefault("hooks", [])
@@ -63,11 +84,11 @@ def merge_hooks(target: dict, preset: dict, changes: list[str]) -> None:
                     if hook.get("command") == command:
                         if hook != preset_hook:
                             hooks[index] = copy.deepcopy(preset_hook)
-                            changes.append(f"hooks.{event}[{matcher}] {command} 갱신")
+                            changes.append(f"변경  hooks.{event}[{matcher}] {command}")
                         break
                 else:
                     hooks.append(copy.deepcopy(preset_hook))
-                    changes.append(f"hooks.{event}[{matcher}] {command} 추가")
+                    changes.append(f"추가  hooks.{event}[{matcher}] {command}")
 
 
 def write_atomically(path: Path, text: str) -> None:
@@ -133,7 +154,7 @@ def main() -> int:
         )
 
     for change in changes:
-        print(f"  + {change}")
+        print(f"  {change}")
     return 0
 
 

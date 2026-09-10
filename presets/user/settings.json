@@ -11,6 +11,7 @@
     "superpowers@claude-plugins-official": true,
     "claude-code-setup@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
     "serena@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
     "github@claude-plugins-official": true,
@@ -18,12 +19,14 @@
 
     "sentry@claude-plugins-official": false,
     "skill-creator@claude-plugins-official": false,
+    "telegram@claude-plugins-official": false,
     "vercel@claude-plugins-official": false,
     "frontend-design@claude-plugins-official": false,
     "playwright@claude-plugins-official": false
   },
   "env": {
-    "CONTEXT7_API_KEY": ""
+    "CONTEXT7_API_KEY": "",
+    "GITHUB_PERSONAL_ACCESS_TOKEN": ""
   },
   "hooks": {
     "PreToolUse": [

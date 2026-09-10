@@ -41,10 +41,21 @@ python3 "$script_dir/merge-settings.py" presets/user/settings.json "$settings" \
   --backup-dir "$claude_home/backups"
 
 # 3. 값을 채워야 하는 env 를 알린다.
+#
+#    비어 있어도 서버가 뜨는 것과 뜨지 못하는 것을 구분해서 적는다. 둘을 같은
+#    말투로 경고하면 진짜 죽은 쪽이 묻힌다.
 if [ -z "$(jq -r '.env.CONTEXT7_API_KEY // ""' "$settings")" ]; then
   echo
-  echo "경고: CONTEXT7_API_KEY 가 비어 있다. 비워두면 401 이 난다."
+  echo "알림: CONTEXT7_API_KEY 가 비어 있다. 익명으로 연결되고 rate limit 만 낮다."
   echo "  https://context7.com/dashboard 에서 발급해 $settings 에 넣는다."
+fi
+
+if [ -z "$(jq -r '.env.GITHUB_PERSONAL_ACCESS_TOKEN // ""' "$settings")" ]; then
+  echo
+  echo "경고: GITHUB_PERSONAL_ACCESS_TOKEN 이 비어 있다. github MCP 가 400 으로 죽는다."
+  echo "  빈 Bearer 헤더가 나가기 때문이고, 이쪽은 context7 과 달리 빈 값을 받아주지 않는다."
+  echo "  https://github.com/settings/tokens 에서 발급해 $settings 에 넣는다."
+  echo "  붙이지 않을 거라면 enabledPlugins 의 github 을 false 로 내린다."
 fi
 
 # 4. 게이트가 실제로 서는지 확인한다.
