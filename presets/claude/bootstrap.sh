@@ -40,9 +40,14 @@ for dependency in python3 jq claude; do
 done
 
 # 1. 훅 스크립트를 먼저 복사한다.
+#
+#    줄표 차단 훅은 Codex 와 같은 파일을 쓴다. codex/bootstrap.sh 도 같은 원본을
+#    ~/.codex/hooks/ 에 복사한다.
 mkdir -p "$claude_home/hooks"
 install -m 755 presets/user/hooks/fanout-cost-gate.sh "$claude_home/hooks/"
 echo "훅 설치: $claude_home/hooks/fanout-cost-gate.sh"
+install -m 755 presets/user/hooks/no-dash-gate.py "$claude_home/hooks/"
+echo "훅 설치: $claude_home/hooks/no-dash-gate.py"
 
 # 2. 프로젝트 스코프가 켜는 플러그인을 유저 캐시에 깐다.
 #
@@ -151,6 +156,17 @@ if [ "$untouched" != "allow" ]; then
   exit 1
 fi
 echo "  무관한 명령은 통과"
+
+# 줄표 차단 훅도 같은 이유로 확인한다. 가짜 페이로드는 테스트 스크립트가 들고 있고,
+# Codex 부트스트랩도 같은 스크립트로 확인한다.
+echo
+echo "줄표 차단 훅 검증"
+if ! result=$(python3 presets/user/hooks/test-no-dash-gate.py "$claude_home/hooks/no-dash-gate.py" 2>&1); then
+  printf '%s\n' "$result" >&2
+  echo "실패: 줄표 차단 훅이 기대대로 막거나 통과시키지 않았다" >&2
+  exit 1
+fi
+echo "  $(printf '%s\n' "$result" | tail -1)"
 
 echo
 echo "완료. 새 대화를 열어야 플러그인 목록이 다시 적재된다."

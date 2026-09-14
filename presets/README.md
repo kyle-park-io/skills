@@ -26,6 +26,7 @@ frontend, backend, infra 세 도메인에서 끌어와야 하는데, 도메인�
 | Claude 프로젝트 | `<repo>/.claude/settings.json` | 그 스택 전용 플러그인 | **한다** |
 | Claude 로컬 | `<repo>/.claude/settings.local.json` | `permissions.allow` | **안 한다** |
 | Codex 유저 | `~/.codex/config.toml` | 캐시된 플러그인의 기본 상태 | 해당 없음 |
+| Codex 유저 훅 | `~/.codex/hooks.json` | 줄표 차단 훅 | 해당 없음 |
 | Codex 프로젝트 | `<repo>/.codex/config.toml` | 자체 도메인 활성화, 프로젝트 MCP | **한다** |
 | Codex 독립 스킬 | `<repo>/.agents/skills/` | 플러그인 밖의 프로젝트 스킬 | **한다** |
 
@@ -64,9 +65,9 @@ bash presets/claude/bootstrap.sh
 - [`user/settings.json`](user/settings.json)의 `extraKnownMarketplaces`, `enabledPlugins`, `hooks`를 `~/.claude/settings.json`에 병합한다. `claude plugin list`를 같이 넘겨서 **설치되지 않은 플러그인의 `false`는 적지 않는다** (아래 [지우지 않고 `false`로 적는다](#지우지-않고-false로-적는다)). **덮어쓰지 않는다.** `model`, `theme`, `effortLevel` 같은 개인 설정이 그 파일에 같이 살기 때문이다. 실제로 값이 바뀔 때만 `~/.claude/backups/`에 이전 파일을 남긴다. 바뀐 항목은 **추가와 변경을 구분해** 찍는다. 플러그인을 내린 것이 켠 것처럼 보이면 적용 결과를 눈으로 확인할 방법이 없다.
 - `env`는 **빈 값일 때만** 자리를 만든다. 프리셋의 `CONTEXT7_API_KEY`가 빈 문자열이라, 그대로 덮어쓰면 이미 발급해 넣은 키를 지운다.
 - `hooks`는 `command` 기준으로 합친다. 이미 붙여 둔 다른 훅은 건드리지 않는다.
-- [`user/hooks/fanout-cost-gate.sh`](user/hooks/fanout-cost-gate.sh)를 `~/.claude/hooks/`에 복사하고 실행 권한을 준다.
+- [`user/hooks/fanout-cost-gate.sh`](user/hooks/fanout-cost-gate.sh)와 [`user/hooks/no-dash-gate.py`](user/hooks/no-dash-gate.py)를 `~/.claude/hooks/`에 복사하고 실행 권한을 준다.
 - [`claude/serena-config.py`](claude/serena-config.py)로 `~/.serena/serena_config.yml`의 `gui_log_window`와 `web_dashboard_open_on_launch`를 `false`로 내린다. Serena 자신의 설정 파일이라 `settings.json` 병합이 닿지 않는데, 끄지 않으면 세션을 적재할 때마다 브라우저 탭이 열린다. 대시보드 자체는 살려 두므로 필요하면 `http://localhost:24282/dashboard/`로 직접 들어간다.
-- 훅에 가짜 페이로드를 먹여 세션 42개짜리 명령이 차단되는지, `CLAUDE_FANOUT_ACK=42`가 통과되는지, 무관한 명령이 통과되는지 셋 다 확인한다. 하나라도 어긋나면 0이 아닌 값으로 죽는다.
+- 훅에 가짜 페이로드를 먹여 세션 42개짜리 명령이 차단되는지, `CLAUDE_FANOUT_ACK=42`가 통과되는지, 무관한 명령이 통과되는지 셋 다 확인한다. 줄표 차단 훅은 [`user/hooks/test-no-dash-gate.py`](user/hooks/test-no-dash-gate.py)의 가짜 페이로드 17건으로 확인한다. 하나라도 어긋나면 0이 아닌 값으로 죽는다.
 
 **Serena 설정만 YAML 파서를 쓰지 않는다.** 그 파일은 주석이 본문보다 길고, 대시보드를 수동으로 여는 주소 같은 것이 전부 주석에 있다. 통째로 다시 쓰면 그게 사라지니 두 줄만 갈아 끼운다. 그리고 그 파일은 **Serena 가 처음 실행될 때 생긴다.** 새 머신에서는 부트스트랩이 먼저 도니 없는 것이 정상이고, 그때는 알리고 넘어간다. Serena 를 한 번 띄운 뒤 부트스트랩을 다시 돌린다.
 
@@ -115,6 +116,11 @@ bash presets/codex/bootstrap.sh
 이미 있으면 최신 마켓플레이스 버전으로 갱신한다.
 프로젝트용 도메인도 로컬 캐시에 설치하지만 사용자 기본값은 `false`로 되돌린다.
 각 레포의 `.codex/config.toml`이 필요한 도메인만 `true`로 덮어쓴다.
+
+플러그인보다 먼저 줄표 차단 훅을 설치한다. Claude 와 같은 원본 스크립트를 `~/.codex/hooks/`에 복사하고,
+[`codex/hooks.json`](codex/hooks.json)을 `~/.codex/hooks.json`에 병합한 뒤, 같은 테스트로 확인한다.
+**Codex 는 사용자가 신뢰하지 않은 훅을 실행하지 않는다.** 부트스트랩이 끝나면 `codex`를 열고 `/hooks`에서
+`no-dash-gate`를 한 번 신뢰한다. 신뢰는 훅 정의의 해시에 걸리므로 정의를 바꾸면 다시 신뢰한다.
 
 **캐시 목록의 기준은 "비어 있는가"가 아니라 "참조되는가"다.** 어느 프로젝트
 설정에서든 `true`로 켜는 도메인은 전부 캐시에 있어야 한다. Codex는 사용자
@@ -172,11 +178,30 @@ CLAUDE_FANOUT_ACK=42 python3 scripts/real-trigger-eval.py --eval-set eval.json -
 
 **왜 있는가.** 2026-09-09에 트리거 eval을 14쿼리 x 3회로 백그라운드 실행했고, 그것이 Opus 세션 42개와 에이전트 작업 113분이 되어 사용량 한도를 태웠다. 대화 컨텍스트는 싸다 (그 세션 전체가 178k / 1M). 비싼 것은 **세션을 새로 여는 일**이고 각 세션이 자기 시스템 프롬프트를 새로 싣는다. 그리고 그 수는 명령을 읽으면 실행 전에 계산된다. 계산할 수 있는 것을 사고가 난 뒤에 알 이유가 없다.
 
+## 줄표 차단 훅
+
+`user/hooks/no-dash-gate.py`. Claude Code 와 Codex 가 같은 스크립트를 쓴다. 에이전트가 파일이나 명령에 줄표(U+2014, U+2013, U+2015)를 쓰려 하면 `PreToolUse`에서 `deny`로 막고, 걸린 줄과 고치는 방법을 사유로 돌려준다.
+
+| 하네스 | 등록 | 가로채는 도구 |
+|---|---|---|
+| Claude Code | [`user/settings.json`](user/settings.json) | `Bash`, `Write`, `Edit`, `MultiEdit`, `NotebookEdit` |
+| Codex | [`codex/hooks.json`](codex/hooks.json) | `Bash`, `apply_patch` (`Edit`, `Write` 매처도 `apply_patch`로 들어온다) |
+
+**새로 들어가는 글만 본다.** Claude `Edit`은 `new_string`만, Codex `apply_patch`는 `+`로 시작하는 추가 줄만 검사한다. 줄표를 지우는 수정까지 막으면 고칠 방법이 없어진다. Bash 는 명령 전체를 본다. 명령에서 추가와 삭제를 가를 수 없어서다.
+
+**통과시키는 법은 두 가지다.** 원문을 그대로 옮겨야 하는 파일은 쓰기 도구 대신 `cp`로 복사한다. 줄표를 찾거나 지우는 명령은 문자를 직접 쓰지 않고 코드 포인트 이스케이프로 쓴다. 따로 여는 토큰은 두지 않았다. 두 방법으로 충분히 우회되고, 토큰이 있으면 에이전트가 토큰부터 붙인다.
+
+**답변 텍스트는 막지 못한다.** 훅은 도구 호출만 본다. 화면에 나가는 답변의 줄표는 규칙과 메모리로 지킨다.
+
+**훅 파일에 줄표 문자를 직접 쓰지 않는다.** 훅이 켜진 세션에서 그 파일을 고치다가 막힌다. 스크립트와 테스트 모두 `chr(0x2014)`나 `\u2014` 이스케이프로 만든다.
+
+**왜 있는가.** 줄표는 에이전트가 쓴 글이라는 티가 가장 많이 나는 표시다. 규칙으로 적어 두었지만 규칙만으로는 계속 새어 나왔다. 규칙과 근거는 비공개 레포 `writing-guides`의 `common/general/ai-tells.md`에 있다.
+
 ## user/
 
 유저 스코프 원본. 켜는 것 7개, 끄는 것 5개다.
 
-이 디렉터리의 JSON과 훅은 Claude Code 전용이다. Codex의 공통 설치 목록은
+이 디렉터리의 JSON과 `fanout-cost-gate.sh`는 Claude Code 전용이다. `no-dash-gate.py`만 Codex 와 같이 쓴다. Codex의 공통 설치 목록은
 [`codex/bootstrap.sh`](codex/bootstrap.sh)가 맡는다.
 
 **여기 둘 조건은 "언제 쓸지 모른다"가 아니라 "어느 레포에서든 쓴다"다.** 스킬 30개를 넘기지 않는다 (현재 21개. `~/.claude/skills/`의 4개까지 세면 25개). 근거는 [`../docs/SETUP-GUIDE.md`](../docs/SETUP-GUIDE.md) §1, §3.

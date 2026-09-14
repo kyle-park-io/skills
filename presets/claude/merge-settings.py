@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Merge the repo preset into a user-scope Claude Code settings.json."""
+"""Merge the repo preset into a user-scope Claude Code settings.json.
+
+Codex bootstrap also uses it for ~/.codex/hooks.json. That preset carries only
+`hooks`, so only merge_hooks runs.
+"""
 
 from __future__ import annotations
 

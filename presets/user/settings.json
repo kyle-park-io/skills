@@ -44,6 +44,23 @@
             "command": "~/.claude/hooks/fanout-cost-gate.sh",
             "timeout": 10,
             "statusMessage": "병렬 실행 비용 확인"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/no-dash-gate.py",
+            "timeout": 10,
+            "statusMessage": "줄표 확인"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/no-dash-gate.py",
+            "timeout": 10,
+            "statusMessage": "줄표 확인"
           }
         ]
       }

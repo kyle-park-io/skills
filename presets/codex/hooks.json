@@ -1,0 +1,18 @@
+{
+  "description": "유저 스코프 훅. presets/codex/bootstrap.sh 가 ~/.codex/hooks.json 에 병합한다.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^(Bash|apply_patch|Edit|Write)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.codex/hooks/no-dash-gate.py",
+            "timeout": 10,
+            "statusMessage": "줄표 확인"
+          }
+        ]
+      }
+    ]
+  }
+}
